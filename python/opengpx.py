@@ -3,12 +3,10 @@ import bpy
 print("starting gpx manipulation in blender")
 argv = sys.argv
 argv = argv[argv.index("--") + 1:]
-gpxpath = "/home/pi/fourth-app/" + argv[0]
+gpxpath = "/home/pi/gpx-renderer/" + argv[0]
 print("Gpx path : " + gpxpath)
 #import gpx file using blender-gpx addon
-#bpy.ops.import_scene.gpx(filepath="/home/pi/fourth-app/blender/mygpxdata.GPX")
 bpy.ops.import_scene.gpx(filepath=gpxpath)
-#bpy.ops.import_scene.gpx(filepath=bpy.path.abspath("//mygpxdata.GPX"))
 
 #resize to reasonnable size
 bpy.ops.transform.resize(value=(0.002, 0.002, 0.002))
@@ -49,7 +47,7 @@ rnd.resolution_percentage = 100
 bpy.context.scene.cycles.samples = 100
 
 #get gpx file name and remove "uploads/" and ".gpx" to make a nice output name
-renderpath = '/home/pi/fourth-app/renders/' + argv[0][8:-4] + '_render.png'
+renderpath = '/home/pi/gpx-renderer/renders/' + argv[0][8:-4] + '_render.png'
 rnd.filepath = renderpath
 bpy.ops.render.render(write_still=True)
 
