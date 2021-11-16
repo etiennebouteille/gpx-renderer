@@ -46,22 +46,25 @@ app.post("/upload", (req, res, next) => {
         const { spawn }  = require('child_process');
         const pyProg = spawn('blender', ["-b", "blender/gpx_basefile_283.blend", "--python", "python/opengpx.py", "--", req.file.path]);
 
+        pyProg.stdout.on('data', function(data){
+            //console.log("Piping data from python");
+            //pythonData = data.toString();
+            console.log(data.toString());
+        });
+
         pyProg.on('close', (code) => {
             console.log(`child process close all stdio with code ${code}, rendering done`);
             //next();
             // send data to browser
-            //res.send(`<p>File uploaded! Here is the outcome : ${pythonData}</p>`)
         });
 
-        res.render('upload', {'filepath': req.file.path});
-        // res.send(`<p>File uploaded and processing! filepath : ${req.file.path}</p>`);
+        let imgpath = req.file.path.slice(8, -4);
+        imgpath = imgpath.concat('.png')
+
+        res.render('upload', {'filepath': req.file.path, 'imgpath': imgpath});
     })
 
-    // pyProg.stdout.on('data', function(data){
-    //     //console.log("Piping data from python");
-    //     //pythonData = data.toString();
-    //     console.log(data.toString());
-    // });
+    
 });
 
 app.use('/finished', (req, res) => {
