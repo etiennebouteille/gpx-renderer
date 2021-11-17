@@ -28,9 +28,11 @@ const storage = multer.diskStorage({
     }
 });
 
+//POST request triggered when the upload button is clicked
 app.post("/upload", (req, res, next) => {
     let upload = multer({storage: storage, fileFilter: helpers.gpxFilter}).single("gpxfile");
 
+    //everything happens in upload loop, if no error is detected then in proceeds
     upload(req, res, function(err){
         if (req.fileValidationError) {
             return res.send(req.fileValidationError);
@@ -47,12 +49,13 @@ app.post("/upload", (req, res, next) => {
         
         console.log("upload worked fine");
 
+        //start child process that works blender in the background
         const { spawn }  = require('child_process');
         const pyProg = spawn('blender', ["-b", "blender/gpx_basefile_283.blend", "--python", "python/opengpx.py", "--", req.file.path]);
 
+        //transforming the upload filepath to the render filepath
         let imgpath = req.file.path.slice(8, -4);
         imgpath = "/renders/" + imgpath + "_render.png"
-        // imgpath = imgpath.concat('.png')
 
         io.on("connection", (socket) => {
             console.log("User connected to the upload page : " + socket.id);
@@ -64,6 +67,7 @@ app.post("/upload", (req, res, next) => {
             });
         });
 
+        //piping the python output to the node console
         pyProg.stdout.on('data', function(data){
             //pythonData = data.toString();
             console.log(data.toString());

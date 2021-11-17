@@ -9,7 +9,7 @@
         <img id="myimage" src="/img/loading.jpg" alt='an image that says loading' width=540 height=540>
         <p>Upload was a success! You uploaded the file : <%= filepath %></p>
         <script>
-            const socket = io('192.168.1.4:5000');
+            const socket = io();
 
             socket.on('message', (text, imgpath) => {
                 document.querySelector('h2').innerHTML = text;
