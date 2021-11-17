@@ -1,6 +1,22 @@
 <!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://cdn.socket.io/4.3.2/socket.io.min.js" integrity="sha384-KAZ4DtjNhLChOB/hxXuKqhMLYvx3b5MlT55xPEiNmREKRzeEm+RVPlTnAn0ajQNs" crossorigin="anonymous"></script>
+    </head>
     <body>
-        <h1>Upload in progress!</h1>
-        <img src=<%= imgpath %> alt='rendu de la trace gpx' width=540 height=540>
+        <h1>Upload succesfull!</h1>
+        <h2>Rendering in progress...</h2>
+        <img id="myimage" src="/img/loading.jpg" alt='an image that says loading' width=540 height=540>
         <p>Upload was a success! You uploaded the file : <%= filepath %></p>
+        <script>
+            const socket = io('192.168.1.4:5000');
+
+            socket.on('message', (text, imgpath) => {
+                document.querySelector('h2').innerHTML = text;
+                document.getElementById('myimage').src = imgpath;
+                document.getElementById('myimage').alt = "rendu de la trace gpx"
+            });
+
+        </script>
     </body>
+</html>

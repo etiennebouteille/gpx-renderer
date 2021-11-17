@@ -1,4 +1,5 @@
 node_modules/
-renders/*
-
-!renders/.gitkeep
+public/renders/*
+!public/renders/.gitkeep
+uploads/*
+!upload/.gitkeep

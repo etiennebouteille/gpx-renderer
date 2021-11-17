@@ -47,7 +47,7 @@ rnd.resolution_percentage = 100
 bpy.context.scene.cycles.samples = 100
 
 #get gpx file name and remove "uploads/" and ".gpx" to make a nice output name
-renderpath = '/home/pi/gpx-renderer/renders/' + argv[0][8:-4] + '_render.png'
+renderpath = '/home/pi/gpx-renderer/public/renders/' + argv[0][8:-4] + '_render.png'
 rnd.filepath = renderpath
 bpy.ops.render.render(write_still=True)
 

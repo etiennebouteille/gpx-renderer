@@ -5,15 +5,19 @@ const helpers = require("./modules/helpers");
 const main = require('./routes/main');
 
 const app = express();
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
 
 //register view engine
 app.set('view engine', 'ejs');
 
 const port = 5000;
 
-// app.use(express.static('public'));
+//main routing
 app.use('/', main);
+app.use(express.static('public'));
 
+//config for the downloaded files : where they go and what they should be called
 const storage = multer.diskStorage({
     destination: function(req, file, cb){
         cb(null, 'uploads/');
@@ -46,34 +50,34 @@ app.post("/upload", (req, res, next) => {
         const { spawn }  = require('child_process');
         const pyProg = spawn('blender', ["-b", "blender/gpx_basefile_283.blend", "--python", "python/opengpx.py", "--", req.file.path]);
 
+        let imgpath = req.file.path.slice(8, -4);
+        imgpath = "/renders/" + imgpath + "_render.png"
+        // imgpath = imgpath.concat('.png')
+
+        io.on("connection", (socket) => {
+            console.log("User connected to the upload page : " + socket.id);
+
+            pyProg.on('close', (code) => {
+                console.log(`child process close all stdio with code ${code}, rendering done`);
+
+                socket.emit('message', "rendering done", imgpath);
+            });
+        });
+
         pyProg.stdout.on('data', function(data){
-            //console.log("Piping data from python");
             //pythonData = data.toString();
             console.log(data.toString());
         });
 
-        pyProg.on('close', (code) => {
-            console.log(`child process close all stdio with code ${code}, rendering done`);
-            //next();
-            // send data to browser
-        });
-
-        let imgpath = req.file.path.slice(8, -4);
-        imgpath = imgpath.concat('.png')
-
-        res.render('upload', {'filepath': req.file.path, 'imgpath': imgpath});
+        res.render('upload', {'filepath': req.file.path});
     })
 
     
 });
 
-app.use('/finished', (req, res) => {
-    console.log('made it to the next request');
-    res.send("<p>Your image is done rendering!</p>");
-});
-
 app.get('/a', (req, res) => {
+
     res.send("<p>Not much to see here!</p>");
 });
 
-app.listen(port, ()=> console.log(`App started, listening on port ${port}...`))
+server.listen(port, ()=> console.log(`App started, listening on port ${port}...`))
