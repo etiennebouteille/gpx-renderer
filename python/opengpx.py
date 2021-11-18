@@ -4,7 +4,6 @@ from xml.etree import ElementTree as ET
 import os
 import time
 
-
 print("starting gpx manipulation in blender")
 
 ns = {"gpx": "http://www.topografix.com/GPX/1/1"} 
@@ -48,37 +47,67 @@ bpy.context.scene.blosm.minLat = float(attribs['minlat'])
 bpy.context.scene.blosm.maxLon = float(attribs['maxlon'])
 bpy.context.scene.blosm.maxLat = float(attribs['maxlat'])
 
+#scale the number of vertices to the size of the gpx so we dont import a gigantic number of them and crash
+latVertices = int((attribs['maxlat'] - attribs['minlat']) * 3600)
+lonVertices = int((attribs['maxlon'] - attribs['minlon']) * 3600)
+verts = (latVertices)*(lonVertices)
+
+maxverts = 100000
+if verts < maxverts:
+    bpy.context.scene.blosm.terrainReductionRatio = '1'
+elif verts < (maxverts * 4):
+    bpy.context.scene.blosm.terrainReductionRatio = '2'
+else:
+    bpy.context.scene.blosm.terrainReductionRatio = '5'
+
 #import terrain topography using blender osm addon
 bpy.context.scene.blosm.dataType = "terrain"
 bpy.context.scene.blosm.ignoreGeoreferencing = True
 bpy.ops.blosm.import_data()
 
-#pause while it loads, maybe useless?
-# time.sleep(12)
+print("going to import sat data now")
 
-bpy.ops.transform.resize(value=(0.01, 0.01, 0.01))
+bpy.context.scene.blosm.dataType = "overlay"
+bpy.context.scene.blosm.overlayType = 'mapbox-satellite'
+bpy.context.scene.blosm.terrainObject = 'Terrain'
+bpy.ops.blosm.import_data()
 
-# #delete curve extrusion and convert the object to a mesh
-# bpy.context.object.data.bevel_object = None
-# bpy.ops.object.convert(target='MESH')
+print("Sleeping")
+time.sleep(10)
 
-# bpy.ops.object.editmode_toggle()
+#scale terrain to mini size (it imports in real life size and i dont like it)
+goalSize = 10 #in meters
+maxTerrainSize = max(bpy.data.objects['Terrain'].dimensions.x, bpy.data.objects['Terrain'].dimensions.x) 
+scaleFactor = goalSize/maxTerrainSize
+bpy.ops.transform.resize(value=(scaleFactor, scaleFactor, scaleFactor))
 
-# bpy.ops.mesh.select_all(action='SELECT')
-# bpy.ops.mesh.extrude_region_move(TRANSFORM_OT_translate={"value":(0, 0, -5)})
-# #aligne tous les points inferieurs sur le meme plan
-# bpy.ops.transform.resize(value=(1, 1, 0))
-# #push bottom level below lowest point
-# bpy.ops.transform.translate(value=(0, 0, 0.1))
+bpy.context.scene.blosm.dataType = "gpx"
+bpy.context.scene.blosm.gpxProjectOnTerrain = False
+bpy.context.scene.blosm.gpxFilepath = argv[0]
+bpy.ops.blosm.import_data()
+bpy.ops.transform.resize(value=(scaleFactor, scaleFactor, scaleFactor))
 
-# bpy.ops.object.editmode_toggle()
+#delete curve extrusion and convert the object to a mesh
+bpy.context.object.data.bevel_object = None
+bpy.ops.object.convert(target='MESH')
+
+bpy.ops.object.editmode_toggle()
+
+bpy.ops.mesh.select_all(action='SELECT')
+bpy.ops.mesh.extrude_region_move(TRANSFORM_OT_translate={"value":(0, 0, -1.5)})
+#aligne tous les points inferieurs sur le meme plan
+bpy.ops.transform.resize(value=(1, 1, 0))
+#push bottom level below lowest point
+bpy.ops.transform.translate(value=(0, 0, 0.1))
+
+bpy.ops.object.editmode_toggle()
 
 # #align with the ground
 # bpy.ops.transform.translate(value=(0,0,3))
 
-# bpy.ops.object.modifier_add(type='SOLIDIFY')
-# bpy.context.object.modifiers["Solidify"].thickness = 3.03
-# bpy.context.object.modifiers["Solidify"].offset = 0
+bpy.ops.object.modifier_add(type='SOLIDIFY')
+bpy.context.object.modifiers["Solidify"].thickness = 3.03
+bpy.context.object.modifiers["Solidify"].offset = 0
 
 
 print("ready to render")
@@ -95,3 +124,6 @@ rnd.filepath = renderpath
 bpy.ops.render.render(write_still=True)
 
 print("Rendering done ! The file is here : " + renderpath)
+
+#save file
+bpy.ops.wm.save_as_mainfile(filepath="/home/pi/gpx-renderer/blender/blosm-after.blend",copy=True)
