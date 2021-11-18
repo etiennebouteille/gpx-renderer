@@ -1,41 +1,84 @@
 import sys
 import bpy
+from xml.etree import ElementTree as ET
+import os
+import time
+
+
 print("starting gpx manipulation in blender")
-argv = sys.argv
-argv = argv[argv.index("--") + 1:]
-gpxpath = "/home/pi/gpx-renderer/" + argv[0]
-print("Gpx path : " + gpxpath)
-#import gpx file using blender-gpx addon
-bpy.ops.import_scene.gpx(filepath=gpxpath)
 
-#resize to reasonnable size
-bpy.ops.transform.resize(value=(0.002, 0.002, 0.002))
+ns = {"gpx": "http://www.topografix.com/GPX/1/1"} 
 
-#center object on world origin
-bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_VOLUME', center='MEDIAN')
-bpy.context.object.location = (0, 0, 0)
+argv = sys.argv[sys.argv.index("--") + 1:]
+tree = ET.parse(argv[0])
+root = tree.getroot()
 
-#delete curve extrusion and convert the object to a mesh
-bpy.context.object.data.bevel_object = None
-bpy.ops.object.convert(target='MESH')
+#gpx1.1 hast two main branches : metadata and trk
 
-bpy.ops.object.editmode_toggle()
+#get to the metadata in xml file using the namespace prefix, otherwise it doesnt work
+metadata = tree.find("{http://www.topografix.com/GPX/1/1}metadata")
+#getting the bounds in the metadata, another way to work with the namespace
+bounds = metadata.find("gpx:bounds", ns)
+#the bound coordinates are in the attributes of the bound, like so :
+#<bounds minlat="59.4367664166667" maxlat="59.4440920666666" minlon="24.74394385" maxlon="24.7971432"/>
+attribs = bounds.attrib
+#convert the bounds from a dictionnary to an array of floats
+# boundCoords = [(k, float(v)) for k, v in attribs.iteritems()]
 
-bpy.ops.mesh.select_all(action='SELECT')
-bpy.ops.mesh.extrude_region_move(TRANSFORM_OT_translate={"value":(0, 0, -5)})
-#aligne tous les points inferieurs sur le meme plan
-bpy.ops.transform.resize(value=(1, 1, 0))
-#push bottom level below lowest point
-bpy.ops.transform.translate(value=(0, 0, 0.1))
+order = {'minlon', 'minlat', 'maxlon', 'maxlat'}
 
-bpy.ops.object.editmode_toggle()
+for i in attribs:
+    attribs[i] = float(attribs[i])
 
-#align with the ground
-bpy.ops.transform.translate(value=(0,0,3))
+#make bounds larger so the gpx doesnt touch the borders
+#we had the same padding on lat and long, lat are bigger numbers 
+# so it's too big if we multiply by the same as long
+for i in order:
+    if i == 'minlat':
+        attribs[i] = attribs[i] - (attribs['minlon'] * 0.001)
+    if i == 'minlon':
+        attribs[i] = attribs[i] * 0.999
+    if i == 'maxlat':
+        attribs[i] = attribs[i] + (attribs['maxlon'] * 0.001)
+    if i == 'maxlon':
+        attribs[i] = attribs[i] * 1.001
 
-bpy.ops.object.modifier_add(type='SOLIDIFY')
-bpy.context.object.modifiers["Solidify"].thickness = 3.03
-bpy.context.object.modifiers["Solidify"].offset = 0
+bpy.context.scene.blosm.minLon = float(attribs['minlon'])
+bpy.context.scene.blosm.minLat = float(attribs['minlat'])
+bpy.context.scene.blosm.maxLon = float(attribs['maxlon'])
+bpy.context.scene.blosm.maxLat = float(attribs['maxlat'])
+
+#import terrain topography using blender osm addon
+bpy.context.scene.blosm.dataType = "terrain"
+bpy.context.scene.blosm.ignoreGeoreferencing = True
+bpy.ops.blosm.import_data()
+
+#pause while it loads, maybe useless?
+# time.sleep(12)
+
+bpy.ops.transform.resize(value=(0.01, 0.01, 0.01))
+
+# #delete curve extrusion and convert the object to a mesh
+# bpy.context.object.data.bevel_object = None
+# bpy.ops.object.convert(target='MESH')
+
+# bpy.ops.object.editmode_toggle()
+
+# bpy.ops.mesh.select_all(action='SELECT')
+# bpy.ops.mesh.extrude_region_move(TRANSFORM_OT_translate={"value":(0, 0, -5)})
+# #aligne tous les points inferieurs sur le meme plan
+# bpy.ops.transform.resize(value=(1, 1, 0))
+# #push bottom level below lowest point
+# bpy.ops.transform.translate(value=(0, 0, 0.1))
+
+# bpy.ops.object.editmode_toggle()
+
+# #align with the ground
+# bpy.ops.transform.translate(value=(0,0,3))
+
+# bpy.ops.object.modifier_add(type='SOLIDIFY')
+# bpy.context.object.modifiers["Solidify"].thickness = 3.03
+# bpy.context.object.modifiers["Solidify"].offset = 0
 
 
 print("ready to render")
@@ -52,5 +95,3 @@ rnd.filepath = renderpath
 bpy.ops.render.render(write_still=True)
 
 print("Rendering done ! The file is here : " + renderpath)
-
-
