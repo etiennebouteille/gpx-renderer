@@ -3,3 +3,5 @@ public/renders/*
 !public/renders/.gitkeep
 uploads/*
 !upload/.gitkeep
+blosm-cache/*
+!blosm-cache/.cacheignore
