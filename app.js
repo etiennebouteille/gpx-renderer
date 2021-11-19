@@ -51,7 +51,7 @@ app.post("/upload", (req, res, next) => {
 
         //start child process that works blender in the background
         const { spawn }  = require('child_process');
-        const pyProg = spawn('blender', ["-b", "blender/blosm-exp-basefile2.blend", "--python", "python/opengpx.py", "--", req.file.path]);
+        const pyProg = spawn('blender', ["-b", "blender/blosm-exp-basefile3.blend", "--python", "python/opengpx.py", "--", req.file.path]);
 
         //transforming the upload filepath to the render filepath
         let imgpath = req.file.path.slice(8, -4);

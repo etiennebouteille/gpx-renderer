@@ -60,6 +60,10 @@ elif verts < (maxverts * 4):
 else:
     bpy.context.scene.blosm.terrainReductionRatio = '5'
 
+#necessary to import sattelite apparently
+#https://github.com/vvoovv/blender-osm/issues/234
+bpy.context.scene.blosm.commandLineMode = True
+
 #import terrain topography using blender osm addon
 bpy.context.scene.blosm.dataType = "terrain"
 bpy.context.scene.blosm.ignoreGeoreferencing = True
@@ -68,12 +72,12 @@ bpy.ops.blosm.import_data()
 print("going to import sat data now")
 
 bpy.context.scene.blosm.dataType = "overlay"
-bpy.context.scene.blosm.overlayType = 'mapbox-satellite'
+bpy.context.scene.blosm.overlayType = 'arcgis-satellite'
 bpy.context.scene.blosm.terrainObject = 'Terrain'
 bpy.ops.blosm.import_data()
 
 print("Sleeping")
-time.sleep(10)
+#time.sleep(10)
 
 #scale terrain to mini size (it imports in real life size and i dont like it)
 goalSize = 10 #in meters
@@ -94,7 +98,7 @@ bpy.ops.object.convert(target='MESH')
 bpy.ops.object.editmode_toggle()
 
 bpy.ops.mesh.select_all(action='SELECT')
-bpy.ops.mesh.extrude_region_move(TRANSFORM_OT_translate={"value":(0, 0, -1.5)})
+bpy.ops.mesh.extrude_region_move(TRANSFORM_OT_translate={"value":(0, 0, -1)})
 #aligne tous les points inferieurs sur le meme plan
 bpy.ops.transform.resize(value=(1, 1, 0))
 #push bottom level below lowest point
