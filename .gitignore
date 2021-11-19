@@ -5,3 +5,4 @@ uploads/*
 !upload/.gitkeep
 blosm-cache/*
 !blosm-cache/.cacheignore
+blender/blosm-after.blend

@@ -3,6 +3,7 @@ import bpy
 from xml.etree import ElementTree as ET
 import os
 import time
+import math
 
 print("starting gpx manipulation in blender")
 
@@ -11,6 +12,28 @@ ns = {"gpx": "http://www.topografix.com/GPX/1/1"}
 argv = sys.argv[sys.argv.index("--") + 1:]
 tree = ET.parse(argv[0])
 root = tree.getroot()
+
+#Functions to approximate the conversion from latitude & longitude (degrees) to kilometers
+#https://stackoverflow.com/questions/1253499/simple-calculations-for-working-with-lat-lon-and-km-distance
+def latToKm(lat):
+    km = lat * 110.574
+    return km
+
+def lonToKm(lon, lat):
+    radLat = math.radians(lat)
+    km = lon * (111.320*math.cos(radLat))
+    return km
+
+def kmToLat(km):
+    deg = km / 110.574
+    return deg
+
+def kmToLon(km, lat):
+    radLat = math.radians(lat)
+    deg = km / (111.320*math.cos(radLat))
+    return deg
+
+###--- PARSING GPX FILE ---###
 
 #gpx1.1 hast two main branches : metadata and trk
 
@@ -24,10 +47,13 @@ attribs = bounds.attrib
 #convert the bounds from a dictionnary to an array of floats
 # boundCoords = [(k, float(v)) for k, v in attribs.iteritems()]
 
+###--- PROCESSING COORDONATES TO DFINE TERRAIN BOUNDARIES ---###
+
 order = {'minlon', 'minlat', 'maxlon', 'maxlat'}
 
 for i in attribs:
     attribs[i] = float(attribs[i])
+
 
 #make bounds larger so the gpx doesnt touch the borders
 #we had the same padding on lat and long, lat are bigger numbers 
@@ -42,16 +68,38 @@ for i in order:
     if i == 'maxlon':
         attribs[i] = attribs[i] * 1.001
 
-bpy.context.scene.blosm.minLon = float(attribs['minlon'])
-bpy.context.scene.blosm.minLat = float(attribs['minlat'])
-bpy.context.scene.blosm.maxLon = float(attribs['maxlon'])
-bpy.context.scene.blosm.maxLat = float(attribs['maxlat'])
+#make the terrain a square
+# we need to go from degrees to km because 1 deg of lat and 1 deg of lon
+#are not equal and change according to where you are on the plant
+#fun fact : 1 deg on longitude equals 111km at the equator but only 77km in France!
+latSize = latToKm(attribs['maxlat'] - attribs['minlat'])
+lonSize = latToKm(attribs['maxlon'] - attribs['minlon'])
+maxSize = max(latSize, lonSize)
+
+if maxSize == latSize:
+    d = latSize - lonSize
+    attribs['minlon'] = attribs['minlon'] - kmToLon(d/2, attribs['maxlat'])
+    attribs['maxlon'] = attribs['maxlon'] + kmToLon(d/2, attribs['maxlat'])
+elif maxSize == lonSize:
+    d = lonSize - latSize
+    attribs['minlat'] = attribs['minlat'] - kmToLat(d/2)
+    attribs['maxlat'] = attribs['maxlat'] + kmToLat(d/2)
+
+#send coordinates to blender osm addon
+bpy.context.scene.blosm.minLon = attribs['minlon']
+bpy.context.scene.blosm.minLat = attribs['minlat']
+bpy.context.scene.blosm.maxLon = attribs['maxlon']
+bpy.context.scene.blosm.maxLat = attribs['maxlat']
+
+
+###--- IMPORTING GEO DATA TO BLENDER---###
 
 #scale the number of vertices to the size of the gpx so we dont import a gigantic number of them and crash
 latVertices = int((attribs['maxlat'] - attribs['minlat']) * 3600)
 lonVertices = int((attribs['maxlon'] - attribs['minlon']) * 3600)
 verts = (latVertices)*(lonVertices)
 
+#TODO return error if the file is too big
 maxverts = 100000
 if verts < maxverts:
     bpy.context.scene.blosm.terrainReductionRatio = '1'
@@ -60,7 +108,7 @@ elif verts < (maxverts * 4):
 else:
     bpy.context.scene.blosm.terrainReductionRatio = '5'
 
-#necessary to import sattelite apparently
+#cli mode is necessary to import sattelite :
 #https://github.com/vvoovv/blender-osm/issues/234
 bpy.context.scene.blosm.commandLineMode = True
 
@@ -71,18 +119,18 @@ bpy.ops.blosm.import_data()
 
 print("going to import sat data now")
 
-bpy.context.scene.blosm.dataType = "overlay"
-bpy.context.scene.blosm.overlayType = 'arcgis-satellite'
-bpy.context.scene.blosm.terrainObject = 'Terrain'
-bpy.ops.blosm.import_data()
+#bpy.context.scene.blosm.dataType = "overlay"
+#bpy.context.scene.blosm.overlayType = 'arcgis-satellite'
+#bpy.context.scene.blosm.terrainObject = 'Terrain'
+#bpy.ops.blosm.import_data()
 
-print("Sleeping")
-#time.sleep(10)
+
+###--- EDITING TERRAIN AND GPX MESH TO LOOK NICE ---###
 
 #scale terrain to mini size (it imports in real life size and i dont like it)
 goalSize = 10 #in meters
-maxTerrainSize = max(bpy.data.objects['Terrain'].dimensions.x, bpy.data.objects['Terrain'].dimensions.x) 
-scaleFactor = goalSize/maxTerrainSize
+terrainSize = bpy.data.objects['Terrain'].dimensions.x
+scaleFactor = goalSize/terrainSize
 bpy.ops.transform.resize(value=(scaleFactor, scaleFactor, scaleFactor))
 
 bpy.context.scene.blosm.dataType = "gpx"
@@ -107,15 +155,16 @@ bpy.ops.transform.translate(value=(0, 0, 0.1))
 bpy.ops.object.editmode_toggle()
 
 # #align with the ground
-# bpy.ops.transform.translate(value=(0,0,3))
+bpy.ops.transform.translate(value=(0,0,0.1))
 
 bpy.ops.object.modifier_add(type='SOLIDIFY')
 bpy.context.object.modifiers["Solidify"].thickness = 3.03
 bpy.context.object.modifiers["Solidify"].offset = 0
 
 
+###--- RENDERING ---###
+
 print("ready to render")
-#rendering
 rnd = bpy.data.scenes['Scene'].render
 rnd.resolution_x = 540
 rnd.resolution_y = 540
@@ -129,5 +178,5 @@ bpy.ops.render.render(write_still=True)
 
 print("Rendering done ! The file is here : " + renderpath)
 
-#save file
+#save file, useful to debug what happened with the script
 bpy.ops.wm.save_as_mainfile(filepath="/home/pi/gpx-renderer/blender/blosm-after.blend",copy=True)
