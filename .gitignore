@@ -6,3 +6,4 @@ uploads/*
 blosm-cache/*
 !blosm-cache/.cacheignore
 blender/blosm-after.blend
+*.blend1

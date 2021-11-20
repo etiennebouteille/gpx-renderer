@@ -72,14 +72,15 @@ for i in order:
 # we need to go from degrees to km because 1 deg of lat and 1 deg of lon
 #are not equal and change according to where you are on the plant
 #fun fact : 1 deg on longitude equals 111km at the equator but only 77km in France!
+avrgLat = (attribs['maxlat'] + attribs['minlat']) / 2
 latSize = latToKm(attribs['maxlat'] - attribs['minlat'])
-lonSize = latToKm(attribs['maxlon'] - attribs['minlon'])
+lonSize = lonToKm(attribs['maxlon'] - attribs['minlon'], avrgLat)
 maxSize = max(latSize, lonSize)
 
 if maxSize == latSize:
     d = latSize - lonSize
-    attribs['minlon'] = attribs['minlon'] - kmToLon(d/2, attribs['maxlat'])
-    attribs['maxlon'] = attribs['maxlon'] + kmToLon(d/2, attribs['maxlat'])
+    attribs['minlon'] = attribs['minlon'] - kmToLon(d/2, avrgLat)
+    attribs['maxlon'] = attribs['maxlon'] + kmToLon(d/2, avrgLat)
 elif maxSize == lonSize:
     d = lonSize - latSize
     attribs['minlat'] = attribs['minlat'] - kmToLat(d/2)
@@ -119,10 +120,10 @@ bpy.ops.blosm.import_data()
 
 print("going to import sat data now")
 
-#bpy.context.scene.blosm.dataType = "overlay"
-#bpy.context.scene.blosm.overlayType = 'arcgis-satellite'
-#bpy.context.scene.blosm.terrainObject = 'Terrain'
-#bpy.ops.blosm.import_data()
+bpy.context.scene.blosm.dataType = "overlay"
+bpy.context.scene.blosm.overlayType = 'arcgis-satellite'
+bpy.context.scene.blosm.terrainObject = 'Terrain'
+bpy.ops.blosm.import_data()
 
 
 ###--- EDITING TERRAIN AND GPX MESH TO LOOK NICE ---###
