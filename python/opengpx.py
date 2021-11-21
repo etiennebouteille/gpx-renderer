@@ -134,6 +134,24 @@ terrainSize = bpy.data.objects['Terrain'].dimensions.x
 scaleFactor = goalSize/terrainSize
 bpy.ops.transform.resize(value=(scaleFactor, scaleFactor, scaleFactor))
 
+#extrudes all the vertices, scale them to 0 on z acis and move the to the bottom
+bpy.ops.object.mode_set(mode = 'EDIT')
+bpy.ops.mesh.extrude_region_move(TRANSFORM_OT_translate={"value":(0, 0, 0)})
+bpy.ops.transform.resize(value=(1,1,0))
+bpy.ops.object.mode_set(mode = 'OBJECT')
+terrainObj = bpy.context.active_object
+selectedVerts = [v for v in terrainObj.data.vertices if v.select]
+for v in selectedVerts:
+    v.co.z = -150
+
+#fix the normals so the sides dont look wonky
+bpy.ops.object.mode_set(mode = 'EDIT')
+bpy.ops.mesh.select_all(action='SELECT')
+bpy.ops.mesh.normals_make_consistent(inside=False)
+bpy.ops.object.mode_set(mode = 'OBJECT')
+bpy.context.object.data.use_auto_smooth = True
+
+#Import GPX and resize
 bpy.context.scene.blosm.dataType = "gpx"
 bpy.context.scene.blosm.gpxProjectOnTerrain = False
 bpy.context.scene.blosm.gpxFilepath = argv[0]
@@ -147,16 +165,13 @@ bpy.ops.object.convert(target='MESH')
 bpy.ops.object.editmode_toggle()
 
 bpy.ops.mesh.select_all(action='SELECT')
-bpy.ops.mesh.extrude_region_move(TRANSFORM_OT_translate={"value":(0, 0, -1)})
-#aligne tous les points inferieurs sur le meme plan
-bpy.ops.transform.resize(value=(1, 1, 0))
-#push bottom level below lowest point
-bpy.ops.transform.translate(value=(0, 0, 0.1))
-
-bpy.ops.object.editmode_toggle()
-
-# #align with the ground
-bpy.ops.transform.translate(value=(0,0,0.1))
+bpy.ops.mesh.extrude_region_move(TRANSFORM_OT_translate={"value":(0, 0, 0)})
+bpy.ops.transform.resize(value=(1,1,0))
+bpy.ops.object.mode_set(mode = 'OBJECT')
+gpxObj = bpy.context.active_object
+selectedVerts = [v for v in gpxObj.data.vertices if v.select]
+for v in selectedVerts:
+    v.co.z = -150
 
 bpy.ops.object.modifier_add(type='SOLIDIFY')
 bpy.context.object.modifiers["Solidify"].thickness = 3.03
