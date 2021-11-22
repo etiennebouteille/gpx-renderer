@@ -144,8 +144,17 @@ selectedVerts = [v for v in terrainObj.data.vertices if v.select]
 for v in selectedVerts:
     v.co.z = -150
 
-#fix the normals so the sides dont look wonky
+
 bpy.ops.object.mode_set(mode = 'EDIT')
+
+#assign material to the sides
+bpy.ops.mesh.select_more()
+sidemat = bpy.data.materials["sidemat"]
+bpy.data.objects["Terrain"].data.materials.append(sidemat)
+bpy.context.active_object.active_material_index = 1
+bpy.ops.object.material_slot_assign()
+
+#fix the normals so the sides dont look wonky
 bpy.ops.mesh.select_all(action='SELECT')
 bpy.ops.mesh.normals_make_consistent(inside=False)
 bpy.ops.object.mode_set(mode = 'OBJECT')
@@ -173,6 +182,10 @@ selectedVerts = [v for v in gpxObj.data.vertices if v.select]
 for v in selectedVerts:
     v.co.z = -150
 
+#raise from the ground a little in case it clips
+bpy.ops.transform.translate(value=(0,0,0.1))
+
+#add thickness to the trace
 bpy.ops.object.modifier_add(type='SOLIDIFY')
 bpy.context.object.modifiers["Solidify"].thickness = 3.03
 bpy.context.object.modifiers["Solidify"].offset = 0
@@ -182,10 +195,12 @@ bpy.context.object.modifiers["Solidify"].offset = 0
 
 print("ready to render")
 rnd = bpy.data.scenes['Scene'].render
-rnd.resolution_x = 540
-rnd.resolution_y = 540
+rnd.resolution_x = 1000
+rnd.resolution_y = 1000
 rnd.resolution_percentage = 100
-bpy.context.scene.cycles.samples = 100
+bpy.context.scene.cycles.samples = 50
+bpy.context.scene.render.tile_x = 128
+bpy.context.scene.render.tile_y = 128
 
 #get gpx file name and remove "uploads/" and ".gpx" to make a nice output name
 renderpath = '/home/pi/gpx-renderer/public/renders/' + argv[0][8:-4] + '_render.png'
