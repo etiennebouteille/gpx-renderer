@@ -86,6 +86,9 @@ elif maxSize == lonSize:
     attribs['minlat'] = attribs['minlat'] - kmToLat(d/2)
     attribs['maxlat'] = attribs['maxlat'] + kmToLat(d/2)
 
+totalSurface = latToKm(attribs['maxlat']-attribs['minlat']) * lonToKm(attribs['maxlon']-attribs['minlon'], avrgLat)
+print("Total surface (km2) : " + str(totalSurface))
+
 #send coordinates to blender osm addon
 bpy.context.scene.blosm.minLon = attribs['minlon']
 bpy.context.scene.blosm.minLat = attribs['minlat']
@@ -123,6 +126,10 @@ print("going to import sat data now")
 bpy.context.scene.blosm.dataType = "overlay"
 bpy.context.scene.blosm.overlayType = 'arcgis-satellite'
 bpy.context.scene.blosm.terrainObject = 'Terrain'
+#try:
+#    bpy.ops.blosm.import_data()
+#except RuntimeError as ex:
+#    print("Error loading sat data")
 bpy.ops.blosm.import_data()
 
 
@@ -130,7 +137,7 @@ bpy.ops.blosm.import_data()
 
 #scale terrain to mini size (it imports in real life size and i dont like it)
 goalSize = 10 #in meters
-terrainSize = bpy.data.objects['Terrain'].dimensions.x
+terrainSize = max(bpy.data.objects['Terrain'].dimensions.x, bpy.data.objects['Terrain'].dimensions.y)
 scaleFactor = goalSize/terrainSize
 bpy.ops.transform.resize(value=(scaleFactor, scaleFactor, scaleFactor))
 
