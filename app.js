@@ -84,4 +84,8 @@ app.get('/a', (req, res) => {
     res.send("<p>Not much to see here!</p>");
 });
 
+app.get('/preview', (req, res) => {
+    res.render('index')
+});
+
 server.listen(port, ()=> console.log(`App started, listening on port ${port}...`))
