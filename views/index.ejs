@@ -5,14 +5,19 @@
         <script src="https://cdn.socket.io/4.3.2/socket.io.min.js" ></script>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&display=swap" rel="stylesheet"> 
+        <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&family=Nunito+Sans&display=swap" rel="stylesheet">  
     </head>
     <body>
+        <header>
         <h1><a href="#">BIRDVIEW</a></h1>
+        <a href="#" id="about">About</a>
+        </header>
         <div class="home-container">
             <div class="home-text">
                 <h2>GPS data 👉 3d Map</h2>
-                <p>Birdview turns your outdoor activities into a good looking map, complete with satellite imagery and detailed relief.</p>
+                <p id="description">Birdview turns your outdoor activities into a good looking map, complete with satellite imagery and detailed relief.</p>
+                    <div class="ctas">
+                        <div class="ctabutton">
                         <form id="myform" method="post" action="/upload" enctype="multipart/form-data">
                             <div>
                                 <label class="uploadButton"> Pick a gpx file
@@ -23,7 +28,11 @@
                                 <input class="hiddenButton" type="submit" name="uploadbtn" value="Upload" />
                             </div>
                         </form>
-            <a href="#" class="seelastest">See the latest renders</a>
+                        </div>
+                        <div class="ctabutton">
+                        <a href="#" class="seelastest">See the latest renders</a>
+                        </div>
+                    </div>
             </div>
             <div class="home-image">
                 <img src="/img/aravis_cropped.png" alt="3d map of the aravis mountain range" />
