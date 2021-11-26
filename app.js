@@ -35,10 +35,10 @@ app.post("/upload", (req, res, next) => {
     //everything happens in upload loop, if no error is detected then in proceeds
     upload(req, res, function(err){
         if (req.fileValidationError) {
-            return res.send(req.fileValidationError);
+            return res.render('error', {'error': req.fileValidationError});
         }
         else if (!req.file) {
-            return res.send('No file selected, please pick a gpx file to upload');
+            return res.render('error', {'error': 'No file selected, please pick a gpx file to upload'});
         }
         else if (err instanceof multer.MulterError) {
             return res.send(err);
@@ -79,13 +79,12 @@ app.post("/upload", (req, res, next) => {
     
 });
 
-app.get('/a', (req, res) => {
-
-    res.send("<p>Not much to see here!</p>");
+app.get('/preview', (req, res) => {
+    res.render('upload')
 });
 
-app.get('/preview', (req, res) => {
-    res.render('index')
+app.get('*', function(req, res){
+    res.render('error', {'error': 'This page does not exist'});
 });
 
 server.listen(port, ()=> console.log(`App started, listening on port ${port}...`))

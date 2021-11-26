@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <script src="https://cdn.socket.io/4.3.2/socket.io.min.js" integrity="sha384-KAZ4DtjNhLChOB/hxXuKqhMLYvx3b5MlT55xPEiNmREKRzeEm+RVPlTnAn0ajQNs" crossorigin="anonymous"></script>
-    </head>
+    <%- include('./partials/head.ejs', {title:"Upload"}) %>
     <body>
-        <h1>Upload succesfull!</h1>
+        <%- include('./partials/header.ejs') %>
         <h2>Rendering in progress...</h2>
         <img id="myimage" src="/img/loading.jpg" alt='an image that says loading' width=540 height=540>
-        <p>Upload was a success! You uploaded the file : <%= filepath %></p>
+        <p>Upload was a success! You uploaded the file : <%# filepath #%></p>
         <script>
             const socket = io();
 
