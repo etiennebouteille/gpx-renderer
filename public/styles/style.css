@@ -1,0 +1,132 @@
+header{
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+h1{
+    font-family: 'Kanit', sans-serif;
+    font-weight: 700;
+    font-size: 96px;
+    color: #F02F2F;
+    margin:0;
+    margin-left: 20px;
+}
+
+h1 a{
+    color:inherit;
+    text-decoration:inherit;
+}
+
+#about{
+    font-family: 'Nunito Sans', sans-serif;
+    text-decoration:none;
+    color:#FFFFFF;
+    margin-right: 20px;
+}
+
+h2{
+    font-family: 'Kanit', sans-serif;
+    color:#C6CCD3;
+    font-weight: 500;
+    font-size: 50px;
+    margin:0;
+}
+
+body{
+    background-color: #181E25;
+}
+
+.home-container{
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.home-text{
+    flex:1;
+    margin-left: 50px;
+}
+
+#description {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 18px;
+    width:75%;
+    margin:0;
+}
+
+p{
+    font-family: 'Nunito Sans', sans-serif;
+    /* font-weight: 300; */
+    color: #C6CCD3;
+}
+
+.home-image{
+    flex:2;
+    display: flex;
+    justify-content: center;
+}
+
+.home-image img {
+    max-width: 85%;
+}
+
+.hiddenButton {
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    position: absolute;
+    clip: rect(0 0 0 0);
+    overflow: hidden;
+}
+
+.uploadButton{
+    font-family: 'Kanit', sans-serif;
+    font-weight: 700;
+    display: inline-block;
+    margin: 0;
+    border-width: 0;
+    padding: 12px 50px 14px 50px;
+    max-width: 100%;
+    color: #181E25;
+    font-size: 18px;
+    text-align: center;
+    border-radius: 20px;
+    background: #ACCDF0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.uploadButton:hover{
+    background: #93b8df;
+}
+
+.seelastest{
+    font-family: 'Kanit', sans-serif;
+    font-weight: 700;
+    display: inline-block;
+    margin: 0;
+    border-width: 0;
+    padding: 12px 35px 14px 35px;
+    max-width: 100%;
+    color: #C6CCD3;
+    font-size: 18px;
+    text-align: center;
+    border-radius: 20px;
+    background: #181E25;
+    text-decoration: none;
+    border: 3px solid #ACCDF0;
+    transition: all 0.3s ease;
+}
+
+.seelastest:hover{
+    border:3px solid #506172
+}
+
+.ctas{
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+}

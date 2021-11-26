@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+    <%- include('./partials/head.ejs', {title:"Error"}) %>
+    <body>
+        <%- include('./partials/header.ejs') %>
+        <h2>Oops !</h2>
+        <img id="errorimg" src="/img/trounoir.png" alt='a mountain with a black hole' width=540 height=540>
+        <p><%= error %></p>
+    </body>
+</html>
