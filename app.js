@@ -3,6 +3,7 @@ const multer = require("multer");
 const path = require("path");
 const helpers = require("./modules/helpers");
 const main = require('./routes/main');
+const fs = require('fs');
 
 const app = express();
 const server = require('http').createServer(app);
@@ -51,7 +52,7 @@ app.post("/upload", (req, res, next) => {
 
         //start child process that works blender in the background
         const { spawn }  = require('child_process');
-        const pyProg = spawn('blender', ["-b", "blender/birdview_base.blend", "--python", "python/opengpx.py", "--", req.file.path]);
+        const pyProg = spawn('blender', ["-b", "blender/birdview_basefile.blend", "--python", "python/opengpx.py", "--", req.file.path]);
 
         //transforming the upload filepath to the render filepath
         let imgpath = req.file.path.slice(8, -4);
@@ -84,6 +85,11 @@ app.get('/about', (req, res) => {
 
 app.get('/preview', (req, res) => {
     res.render('upload')
+});
+
+app.get('/latest', (req, res) => {
+    let files = fs.readdirSync("./public/renders/");
+    res.render('latest', {'renders': files});
 });
 
 app.get('*', function(req, res){

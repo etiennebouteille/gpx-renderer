@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <%- include('./partials/head.ejs', {title:"Latest Renders"}) %>
+    <body>
+        <%- include('./partials/header.ejs') %>
+        <div id="latest">
+        <h2>Latest Renders</h2>
+        <div id="latestContainer">
+            <% if (renders.length > 0) { %>
+                <% renders.forEach(renders => { %>
+                    <% let str = "/renders/" %>
+                    <img src=<%= str.concat(renders) %> >
+                <% }) %>
+            <% } %> 
+        </div>
+        </div>
+    </body>
+</html>
