@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <%- include('./partials/head.ejs', {title:"Upload"}) %>
+    <body>
+        <%- include('./partials/header.ejs') %>
+        <div id="about">
+        <h2>About this website</h2>
+        <p>Birdview converts gps tracking data to a rendered map of the environment around the path. 
+            The goal is to output a nice image, ready to be kept as a memory or shared with friends. 
+            As opposed to other similiar tools, Birview uses raytraced rendering instead of realtime 3D. 
+            Raytraced rendering allows beautiful, physically accurate representation of light.</p>
+        <p>This website is made by me, <a href="http://etiennebouteille.com">Etienne Bouteillé</a>. I made the design, backend and frontend dev, 
+            as well as all the shenanigans to automate the renders in Blender. 
+            The gpx trace featured on the homepage is also mine. I use this website to view 
+            my own outdoor adventure, and run it on my own server. Everyone is welcome to use 
+            it but there is no guarantee it will be up tomorrow. Enjoy it while you can!</p>
+        <p>This entire website is built on top and thanks to open source technologies and data. 
+            Thank you Blender, Blender-osm, NodeJs, RaspberryPi, ArcGIS.
+            All the source code for this website is available on github</p>
+        </div>
+    </body>
+</html>

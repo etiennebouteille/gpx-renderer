@@ -18,7 +18,7 @@ h1 a{
     text-decoration:inherit;
 }
 
-#about{
+#aboutmenu{
     font-family: 'Nunito Sans', sans-serif;
     text-decoration:none;
     color:#FFFFFF;
@@ -100,7 +100,16 @@ p{
 }
 
 .uploadButton:hover{
-    background: #93b8df;
+    background: rgb(190, 213, 238);
+}
+
+.buttontext {
+    transition: all 0.3s ease;
+}
+
+.uploadButton:hover .buttontext{
+    /* transform:translateX(5px); */
+    transform:scale(1.03);
 }
 
 .seelastest{
@@ -122,11 +131,29 @@ p{
 }
 
 .seelastest:hover{
-    border:3px solid #506172
+    border:3px solid #506172;
+    
+}
+
+.seelastest:hover .buttontext{
+    transform:translateX(5px);
 }
 
 .ctas{
     margin-top: 30px;
     display: flex;
     justify-content: space-between;
+}
+
+/*** ABOUT ***/
+#about {
+    display:flex;
+    flex-direction: column;
+    justify-content: center;    
+    width:30%;
+    margin: 0 auto;
+}
+
+#about h2 {
+    font-size: 2.3em;
 }

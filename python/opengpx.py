@@ -4,14 +4,25 @@ from xml.etree import ElementTree as ET
 import os
 import time
 import math
+import random
 
 print("starting gpx manipulation in blender")
+
+random.seed()
 
 ns = {"gpx": "http://www.topografix.com/GPX/1/1"} 
 
 argv = sys.argv[sys.argv.index("--") + 1:]
 tree = ET.parse(argv[0])
 root = tree.getroot()
+
+colorpalette = [
+    (0.564, 0.945, 0.937, 1),
+    (1, 0.839, 0.878, 1),
+    (1, 0.937, 0.623, 1),
+    (0.756, 0.984, 0.643, 1),
+    (0.482, 0.945, 0.658, 1)
+]
 
 #Functions to approximate the conversion from latitude & longitude (degrees) to kilometers
 #https://stackoverflow.com/questions/1253499/simple-calculations-for-working-with-lat-lon-and-km-distance
@@ -126,12 +137,7 @@ print("going to import sat data now")
 bpy.context.scene.blosm.dataType = "overlay"
 bpy.context.scene.blosm.overlayType = 'arcgis-satellite'
 bpy.context.scene.blosm.terrainObject = 'Terrain'
-#try:
-#    bpy.ops.blosm.import_data()
-#except RuntimeError as ex:
-#    print("Error loading sat data")
 bpy.ops.blosm.import_data()
-
 
 ###--- EDITING TERRAIN AND GPX MESH TO LOOK NICE ---###
 
@@ -197,6 +203,9 @@ bpy.ops.object.modifier_add(type='SOLIDIFY')
 bpy.context.object.modifiers["Solidify"].thickness = 3.03
 bpy.context.object.modifiers["Solidify"].offset = 0
 
+#set bg color
+paletteIndex = random.randrange(5)
+bpy.data.scenes["Scene"].node_tree.nodes["Alpha Over"].inputs[1].default_value = colorpalette[paletteIndex]
 
 ###--- RENDERING ---###
 
