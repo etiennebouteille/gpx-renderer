@@ -7,10 +7,11 @@ header{
 h1{
     font-family: 'Kanit', sans-serif;
     font-weight: 700;
-    font-size: 96px;
+    font-size: 6.5em;
     color: #F02F2F;
     margin:0;
     margin-left: 20px;
+    line-height: 1em;
 }
 
 h1 a{
@@ -29,8 +30,12 @@ h2{
     font-family: 'Kanit', sans-serif;
     color:#C6CCD3;
     font-weight: 500;
-    font-size: 50px;
+    font-size: 2.3em;
     margin:0;
+}
+
+.home-text h2 {
+    font-size: 50px;
 }
 
 body{
@@ -41,6 +46,7 @@ body{
     display:flex;
     justify-content: space-between;
     align-items: center;
+    margin-top: 5%;
 }
 
 .home-text{
@@ -69,6 +75,7 @@ p{
 
 .home-image img {
     max-width: 85%;
+    height: auto;
 }
 
 .hiddenButton {
@@ -108,7 +115,6 @@ p{
 }
 
 .uploadButton:hover .buttontext{
-    /* transform:translateX(5px); */
     transform:scale(1.03);
 }
 
@@ -154,18 +160,121 @@ p{
     margin: 0 auto;
 }
 
-#about h2 {
-    font-size: 2.3em;
-}
-
 /*** LATEST ***/
 #latestContainer {
     display:flex;
     flex-direction: column;
-    width:60%;
+    width:30%;
     margin: 0 auto;
 }
 
 #latestContainer img {
-    max-width: 50%;
+    margin:10px 0;
+    max-width: 100%;
+}
+
+/*** UPLOAD ***/
+
+#uploadContainer{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    width: 30%;
+    margin: 0 auto;
+}
+
+#uploadContainer p {
+    margin: 0;
+    text-align: center;
+}
+
+#uploadContainer img {
+    max-width: 100%;
+    height: auto;
+    margin:20px 0;
+}
+
+/**** media queries ***/
+
+@media screen and (max-width: 576px){
+    #home {
+        background-image: url("../img/closeup_mobile.png");
+        background-repeat: no-repeat;
+        background-position: center top;
+        background-size: 100% auto;
+    }
+    #latestContainer{
+        width: 90%;
+        margin-top: 10px;
+    }
+
+    #about {
+        width: 90%;
+        margin-top: 10px;
+    }
+
+    .home-container {
+        width:90%;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        margin:0 auto;
+        margin-top:120%;
+    }
+
+    .home-text{
+        margin:0;
+    }
+
+    #description {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .home-image {
+        order:1;
+        flex:0;
+    }
+
+    .home-image img {
+        display: none;
+    }
+
+    h1 {
+        font-size: 2.3em;
+        margin-left: 5px;
+    }
+
+    #home h1 {
+        font-size: 3.2em;
+    }
+
+    h2 {
+        font-size: 1.5em;
+    }
+
+    .home-text h2 {
+        font-size: 2.2em;
+    }
+
+    .ctas {
+        flex-direction: column;
+        justify-content: center;
+        width: 80%;
+        margin:20px auto;
+    }
+
+    .uploadButton {
+        width:80%;
+        margin:0;
+        padding:12px 35px 14px 35px;
+        border-radius: 30px;
+    }
+
+    .seelastest {
+        width:80%;
+        margin-top: 10px;
+        border-radius: 30px;
+        padding:11px 34px 13px 34px;
+    }
 }

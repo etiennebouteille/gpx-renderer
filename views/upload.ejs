@@ -3,9 +3,13 @@
     <%- include('./partials/head.ejs', {title:"Upload"}) %>
     <body>
         <%- include('./partials/header.ejs') %>
-        <h2>Rendering in progress...</h2>
-        <img id="myimage" src="/img/loading.jpg" alt='an image that says loading' width=540 height=540>
-        <p>Upload was a success! You uploaded the file : <%# filepath #%></p>
+        <div id="uploadContainer">
+            <h2>Upload succeful!</h2>
+            <p>Rendering in progress.</p>
+            <img id="myimage" src="/img/loading.jpg" alt='an image that says loading' width=540 height=540>
+            <!-- <p>Upload was a success! You uploaded the file : <%# filepath #%></p> -->
+            <p>This takes 10 to 20 minutes. Keep the tab open or come back later to see the result in the <a href="./latest">latest renders.</a></p>
+        </div>
         <script>
             const socket = io();
 
