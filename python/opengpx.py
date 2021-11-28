@@ -5,16 +5,14 @@ import os
 import time
 import math
 import random
+import gpxpy
+import gpxpy.gpx
 
 print("starting gpx manipulation in blender")
 
 random.seed()
 
-ns = {"gpx": "http://www.topografix.com/GPX/1/1"} 
-
 argv = sys.argv[sys.argv.index("--") + 1:]
-tree = ET.parse(argv[0])
-root = tree.getroot()
 
 colorpalette = [
     (0.564, 0.945, 0.937, 1),
@@ -46,72 +44,58 @@ def kmToLon(km, lat):
 
 ###--- PARSING GPX FILE ---###
 
-#gpx1.1 hast two main branches : metadata and trk
+gpx_file = open(argv[0])
+gpx = gpxpy.parse(gpx_file)
+bounds = gpx.get_bounds()
 
-#get to the metadata in xml file using the namespace prefix, otherwise it doesnt work
-metadata = tree.find("{http://www.topografix.com/GPX/1/1}metadata")
-#getting the bounds in the metadata, another way to work with the namespace
-bounds = metadata.find("gpx:bounds", ns)
-#the bound coordinates are in the attributes of the bound, like so :
-#<bounds minlat="59.4367664166667" maxlat="59.4440920666666" minlon="24.74394385" maxlon="24.7971432"/>
-attribs = bounds.attrib
-#convert the bounds from a dictionnary to an array of floats
-# boundCoords = [(k, float(v)) for k, v in attribs.iteritems()]
+bounds = {'minlat' : bounds.min_latitude, 'maxlat' : bounds.max_latitude, 'minlon' : bounds.min_longitude, 'maxlon' : bounds.max_longitude}
+
 
 ###--- PROCESSING COORDONATES TO DFINE TERRAIN BOUNDARIES ---###
 
-order = {'minlon', 'minlat', 'maxlon', 'maxlat'}
-
-for i in attribs:
-    attribs[i] = float(attribs[i])
-
-
-#make bounds larger so the gpx doesnt touch the borders
-#we had the same padding on lat and long, lat are bigger numbers 
-# so it's too big if we multiply by the same as long
-for i in order:
-    if i == 'minlat':
-        attribs[i] = attribs[i] - (attribs['minlon'] * 0.001)
-    if i == 'minlon':
-        attribs[i] = attribs[i] * 0.999
-    if i == 'maxlat':
-        attribs[i] = attribs[i] + (attribs['maxlon'] * 0.001)
-    if i == 'maxlon':
-        attribs[i] = attribs[i] * 1.001
+for k, v in bounds.items():
+    if k == 'minlat':
+        bounds[k] = v - (bounds['minlon'] * 0.001)
+    if k == 'minlon':
+        bounds[k] = v * 0.999
+    if k == 'maxlat':
+        bounds[k] = v + (bounds['maxlon'] * 0.001)
+    if k == 'maxlon':
+        bounds[k] = v * 1.001
 
 #make the terrain a square
 # we need to go from degrees to km because 1 deg of lat and 1 deg of lon
 #are not equal and change according to where you are on the plant
 #fun fact : 1 deg on longitude equals 111km at the equator but only 77km in France!
-avrgLat = (attribs['maxlat'] + attribs['minlat']) / 2
-latSize = latToKm(attribs['maxlat'] - attribs['minlat'])
-lonSize = lonToKm(attribs['maxlon'] - attribs['minlon'], avrgLat)
+avrgLat = (bounds['maxlat'] + bounds['minlat']) / 2
+latSize = latToKm(bounds['maxlat'] - bounds['minlat'])
+lonSize = lonToKm(bounds['maxlon'] - bounds['minlon'], avrgLat)
 maxSize = max(latSize, lonSize)
 
 if maxSize == latSize:
     d = latSize - lonSize
-    attribs['minlon'] = attribs['minlon'] - kmToLon(d/2, avrgLat)
-    attribs['maxlon'] = attribs['maxlon'] + kmToLon(d/2, avrgLat)
+    bounds['minlon'] = bounds['minlon'] - kmToLon(d/2, avrgLat)
+    bounds['maxlon'] = bounds['maxlon'] + kmToLon(d/2, avrgLat)
 elif maxSize == lonSize:
     d = lonSize - latSize
-    attribs['minlat'] = attribs['minlat'] - kmToLat(d/2)
-    attribs['maxlat'] = attribs['maxlat'] + kmToLat(d/2)
+    bounds['minlat'] = bounds['minlat'] - kmToLat(d/2)
+    bounds['maxlat'] = bounds['maxlat'] + kmToLat(d/2)
 
-totalSurface = latToKm(attribs['maxlat']-attribs['minlat']) * lonToKm(attribs['maxlon']-attribs['minlon'], avrgLat)
+totalSurface = latToKm(bounds['maxlat']-bounds['minlat']) * lonToKm(bounds['maxlon']-bounds['minlon'], avrgLat)
 print("Total surface (km2) : " + str(totalSurface))
 
 #send coordinates to blender osm addon
-bpy.context.scene.blosm.minLon = attribs['minlon']
-bpy.context.scene.blosm.minLat = attribs['minlat']
-bpy.context.scene.blosm.maxLon = attribs['maxlon']
-bpy.context.scene.blosm.maxLat = attribs['maxlat']
+bpy.context.scene.blosm.minLon = bounds['minlon']
+bpy.context.scene.blosm.minLat = bounds['minlat']
+bpy.context.scene.blosm.maxLon = bounds['maxlon']
+bpy.context.scene.blosm.maxLat = bounds['maxlat']
 
 
 ###--- IMPORTING GEO DATA TO BLENDER---###
 
 #scale the number of vertices to the size of the gpx so we dont import a gigantic number of them and crash
-latVertices = int((attribs['maxlat'] - attribs['minlat']) * 3600)
-lonVertices = int((attribs['maxlon'] - attribs['minlon']) * 3600)
+latVertices = int((bounds['maxlat'] - bounds['minlat']) * 3600)
+lonVertices = int((bounds['maxlon'] - bounds['minlon']) * 3600)
 verts = (latVertices)*(lonVertices)
 
 #TODO return error if the file is too big
@@ -132,12 +116,12 @@ bpy.context.scene.blosm.dataType = "terrain"
 bpy.context.scene.blosm.ignoreGeoreferencing = True
 bpy.ops.blosm.import_data()
 
-print("going to import sat data now")
+# print("going to import sat data now")
 
-bpy.context.scene.blosm.dataType = "overlay"
-bpy.context.scene.blosm.overlayType = 'arcgis-satellite'
-bpy.context.scene.blosm.terrainObject = 'Terrain'
-bpy.ops.blosm.import_data()
+# bpy.context.scene.blosm.dataType = "overlay"
+# bpy.context.scene.blosm.overlayType = 'arcgis-satellite'
+# bpy.context.scene.blosm.terrainObject = 'Terrain'
+# bpy.ops.blosm.import_data()
 
 ###--- EDITING TERRAIN AND GPX MESH TO LOOK NICE ---###
 
