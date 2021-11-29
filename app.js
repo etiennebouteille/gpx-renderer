@@ -1,11 +1,11 @@
 const express = require("express");
 const main = require('./routes/main');
-const upload = require('./routes/upload');
 const fs = require('fs');
-
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
+
+const upload = require('./routes/upload')(io);
 
 //register view engine
 app.set('view engine', 'ejs');
