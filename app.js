@@ -64,7 +64,7 @@ app.post("/upload", (req, res, next) => {
             pyProg.on('close', (code) => {
                 console.log(`child process close all stdio with code ${code}, rendering done`);
 
-                socket.emit('message', "rendering done", imgpath);
+                socket.emit('message', "Rendering done !", imgpath);
             });
         });
 

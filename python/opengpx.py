@@ -14,13 +14,19 @@ random.seed()
 
 argv = sys.argv[sys.argv.index("--") + 1:]
 
-colorpalette = [
-    (0.564, 0.945, 0.937, 1),
-    (1, 0.839, 0.878, 1),
-    (1, 0.937, 0.623, 1),
-    (0.756, 0.984, 0.643, 1),
-    (0.482, 0.945, 0.658, 1)
-]
+colorpalette = [0xD6F6DD, 0xDAC4F7, 0xF4989C, 0xEBD2B4, 0xACECF7]
+# colorpalette = [
+#     (0.021219, 0.0368895, 0.00913406, 1),
+#     (0.723055, 0.3564, 0.111932, 1),
+#     (0.672443, 0.0212189, 0.021219, 1)
+# ]
+
+def hex_to_rgb( hex_value ):
+    b = (hex_value & 0xFF) / 255.0
+    g = ((hex_value >> 8) & 0xFF) / 255.0
+    r = ((hex_value >> 16) & 0xFF) / 255.0
+    a = 1
+    return r, g, b, a
 
 #Functions to approximate the conversion from latitude & longitude (degrees) to kilometers
 #https://stackoverflow.com/questions/1253499/simple-calculations-for-working-with-lat-lon-and-km-distance
@@ -116,12 +122,12 @@ bpy.context.scene.blosm.dataType = "terrain"
 bpy.context.scene.blosm.ignoreGeoreferencing = True
 bpy.ops.blosm.import_data()
 
-# print("going to import sat data now")
+print("going to import sat data now")
 
-# bpy.context.scene.blosm.dataType = "overlay"
-# bpy.context.scene.blosm.overlayType = 'arcgis-satellite'
-# bpy.context.scene.blosm.terrainObject = 'Terrain'
-# bpy.ops.blosm.import_data()
+bpy.context.scene.blosm.dataType = "overlay"
+bpy.context.scene.blosm.overlayType = 'arcgis-satellite'
+bpy.context.scene.blosm.terrainObject = 'Terrain'
+bpy.ops.blosm.import_data()
 
 ###--- EDITING TERRAIN AND GPX MESH TO LOOK NICE ---###
 
@@ -189,7 +195,8 @@ bpy.context.object.modifiers["Solidify"].offset = 0
 
 #set bg color
 paletteIndex = random.randrange(5)
-bpy.data.scenes["Scene"].node_tree.nodes["Alpha Over"].inputs[1].default_value = colorpalette[paletteIndex]
+hexcolor = hex_to_rgb(colorpalette[paletteIndex])
+bpy.data.scenes["Scene"].node_tree.nodes["Alpha Over"].inputs[1].default_value = hexcolor
 
 ###--- RENDERING ---###
 
@@ -197,7 +204,7 @@ print("ready to render")
 rnd = bpy.data.scenes['Scene'].render
 rnd.resolution_x = 1000
 rnd.resolution_y = 1000
-rnd.resolution_percentage = 100
+rnd.resolution_percentage = 40
 bpy.context.scene.cycles.samples = 50
 bpy.context.scene.render.tile_x = 128
 bpy.context.scene.render.tile_y = 128

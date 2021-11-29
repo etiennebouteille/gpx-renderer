@@ -277,4 +277,9 @@ p{
         border-radius: 30px;
         padding:11px 34px 13px 34px;
     }
+
+    #uploadContainer {
+        width:90%;
+        margin-top:10px;
+    }
 }
