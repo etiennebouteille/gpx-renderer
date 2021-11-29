@@ -194,6 +194,20 @@ p{
     margin:20px 0;
 }
 
+/*** ERROR ***/
+
+#errorContainer {
+    display:flex;
+    flex-direction: column;
+    width: 40%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+#errorContainter img{
+    max-width: 100%;;
+}
+
 /**** media queries ***/
 
 @media screen and (max-width: 576px){
@@ -281,5 +295,10 @@ p{
     #uploadContainer {
         width:90%;
         margin-top:10px;
+    }
+
+    #errorContainer {
+        width:90%;
+        margin-top: 10px;
     }
 }
