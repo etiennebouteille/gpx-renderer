@@ -14,6 +14,7 @@
             const socket = io();
 
             socket.on('message', (text, imgpath) => {
+                console.log("received a message");
                 document.querySelector('h2').innerHTML = text;
                 document.querySelector('title').innerHTML = "Rendering finished - Birdview";
                 document.getElementById('myimage').src = imgpath;

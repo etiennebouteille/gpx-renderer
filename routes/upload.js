@@ -33,15 +33,10 @@ function render(req, io) {
         let imgpath = req.file.path.slice(8, -4);
         imgpath = "/renders/" + imgpath + "_render.png"
 
-        io.on("connection", (socket) => {
-            console.log("User connected to the upload page : " + socket.id);
-
-            pyProg.on('close', (code) => {
-                console.log(`child process close all stdio with code ${code}, rendering done`);
-                console.log("Sending image to socket : " + socket.id);
-                socket.to(socket.id).emit('message', "Rendering done !", imgpath);
-                resolve(code)
-            });
+        pyProg.on('close', (code) => {
+            console.log(`child process close all stdio with code ${code}, rendering done`);
+            io.sockets.emit('message', "Rendering done !", imgpath);
+            resolve(code, imgpath);
         });
 
         //piping the python output to the node console
@@ -61,8 +56,8 @@ async function queueRender(req, io) {
     return requestQueue.add(() => render(req, io));
 }
 
-requestQueue.on('completed', result => {
-    console.log(`Task finished, tasks left : ${requestQueue.pending}`);
+requestQueue.on('completed', (result) => {
+    console.log(`Task finished, tasks left : ${requestQueue.pending}`);    
 	console.log(result);
 });
 
