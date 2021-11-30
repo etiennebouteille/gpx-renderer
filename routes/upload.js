@@ -1,7 +1,9 @@
-const express = require("express");
-const multer = require("multer");
-const helpers = require("../modules/helpers");
-const path = require("path");
+import express from 'express';
+import multer from 'multer';
+const helpers = import("../modules/helpers.js");
+import path from 'path';
+const router = express.Router();
+import { spawn } from 'child_process';
 
 //config for the downloaded files : where they go and what they should be called
 const storage = multer.diskStorage({
@@ -14,14 +16,11 @@ const storage = multer.diskStorage({
     }
 });
 
+export default function(io){
 
-module.exports = function(io){
-    let router = express.Router();
-
-    //POST request triggered when the upload button is clicked
     router.post('/', (req, res, next) => {
         let upload = multer({storage: storage, fileFilter: helpers.gpxFilter}).single("gpxfile");
-
+    
         //everything happens in upload loop, if no error is detected then it proceeds
         upload(req, res, function(err){
             if (req.fileValidationError) {
@@ -38,35 +37,35 @@ module.exports = function(io){
             }
             
             console.log("upload worked fine");
-
+    
+            console.log("Now to begin with the queuing...");
+    
             //start child process that works blender in the background
-            const { spawn }  = require('child_process');
+            // const { spawn }  = import('child_process');
+            // import spawn from 'child_process';
             const pyProg = spawn('blender', ["-b", "blender/birdview_basefile.blend", "--python", "python/opengpx.py", "--", req.file.path]);
-
+    
             //transforming the upload filepath to the render filepath
             let imgpath = req.file.path.slice(8, -4);
             imgpath = "/renders/" + imgpath + "_render.png"
-
+    
             io.on("connection", (socket) => {
                 console.log("User connected to the upload page : " + socket.id);
-
+    
                 pyProg.on('close', (code) => {
                     console.log(`child process close all stdio with code ${code}, rendering done`);
-
+    
                     socket.emit('message', "Rendering done !", imgpath);
                 });
             });
-
+    
             //piping the python output to the node console
             pyProg.stdout.on('data', function(data){
-                //pythonData = data.toString();
                 console.log(data.toString());
             });
-
             res.render('upload', {'filepath': req.file.path});
         })
-
     });
 
     return router;
-}
+};

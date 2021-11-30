@@ -1,11 +1,13 @@
-const express = require("express");
-const main = require('./routes/main');
-const fs = require('fs');
+import express from 'express';
+import fs from 'fs';
 const app = express();
-const server = require('http').createServer(app);
-const io = require('socket.io')(server);
+import { createServer } from "http";
+import { Server } from "socket.io";
+const server = createServer(app);
+const io = new Server(server);
 
-const upload = require('./routes/upload')(io);
+import mainRouter from './routes/main.js';
+import uploadRouter from './routes/upload.js';
 
 //register view engine
 app.set('view engine', 'ejs');
@@ -14,8 +16,8 @@ app.use(express.static('public'));
 const port = 5000;
 
 //main routing
-app.use('/', main);
-app.use('/upload', upload);
+app.use('/', mainRouter);
+app.use('/upload', uploadRouter(io));
 
 app.get('/about', (req, res) => {
     res.render('about')
