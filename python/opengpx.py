@@ -15,11 +15,6 @@ random.seed()
 argv = sys.argv[sys.argv.index("--") + 1:]
 
 colorpalette = [0xD6F6DD, 0xDAC4F7, 0xF4989C, 0xEBD2B4, 0xACECF7]
-# colorpalette = [
-#     (0.021219, 0.0368895, 0.00913406, 1),
-#     (0.723055, 0.3564, 0.111932, 1),
-#     (0.672443, 0.0212189, 0.021219, 1)
-# ]
 
 def hex_to_rgb( hex_value ):
     b = (hex_value & 0xFF) / 255.0

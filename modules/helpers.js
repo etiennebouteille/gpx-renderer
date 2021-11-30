@@ -6,6 +6,5 @@ const gpxFilter = function(req, file, cb) {
     }
     cb(null, true);
 };
-// exports.gpxFilter = gpxFilter;
 
-export default gpxFilter;
+export { gpxFilter };

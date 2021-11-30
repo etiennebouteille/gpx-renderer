@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-const helpers = import("../modules/helpers.js");
+import { gpxFilter }  from '../modules/helpers.js';
 import path from 'path';
 const router = express.Router();
 import { spawn } from 'child_process';
@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
 export default function(io){
 
     router.post('/', (req, res, next) => {
-        let upload = multer({storage: storage, fileFilter: helpers.gpxFilter}).single("gpxfile");
+        let upload = multer({storage: storage, fileFilter: gpxFilter}).single("gpxfile");
     
         //everything happens in upload loop, if no error is detected then it proceeds
         upload(req, res, function(err){
