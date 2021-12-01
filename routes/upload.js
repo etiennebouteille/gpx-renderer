@@ -63,6 +63,11 @@ requestQueue.on('completed', (result) => {
 
 export default function(io){
 
+    //in case the user reloads the page we dont want them to resend the data so send them back home
+    router.get('/', (req, res) => {
+        res.redirect('../');
+    })
+
     router.post('/', (req, res, next) => {
         let upload = multer({storage: storage, fileFilter: gpxFilter}).single("gpxfile");
     

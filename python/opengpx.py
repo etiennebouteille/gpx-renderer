@@ -105,8 +105,10 @@ if verts < maxverts:
     bpy.context.scene.blosm.terrainReductionRatio = '1'
 elif verts < (maxverts * 4):
     bpy.context.scene.blosm.terrainReductionRatio = '2'
-else:
+elif verts < (maxverts * 25):
     bpy.context.scene.blosm.terrainReductionRatio = '5'
+else : 
+    sys.exit("The area is too big and cannot be rendered")
 
 #cli mode is necessary to import sattelite :
 #https://github.com/vvoovv/blender-osm/issues/234
