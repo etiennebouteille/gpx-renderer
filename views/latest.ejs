@@ -6,10 +6,10 @@
         <div id="latestContainer">
         <h2>Latest Renders</h2>
             <% if (renders.length > 0) { %>
-                <% renders.forEach(renders => { %>
+                <% for (let i = renders.length - 1; i > renders.length - 9; i-- ) { %>
                     <% let str = "/renders/" %>
-                    <img src=<%= str.concat(renders) %> >
-                <% }) %>
+                    <img src=<%= str.concat(renders[i]) %> >
+                <% }; %>
             <% } %> 
         </div>
     </body>
