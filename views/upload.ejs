@@ -6,7 +6,12 @@
         <div id="uploadContainer">
             <h2>Upload succeful!</h2>
             <p>Rendering in progress.</p>
-            <img id="myimage" src="/img/loading.jpg" alt='an image that says loading' width=540 height=540>
+            <img id="myimage" src="" alt='an image that says loading' width=500 height=500 style="display:none;">
+            <video class="loadingvideo" width="500" height="500" autoplay loop>
+                <source src="/img/loading_anim_500_m.webm" type="video/webm" />
+                Your browser does not support the video tag.
+            </video>
+              
             <!-- <p>Upload was a success! You uploaded the file : <%# filepath #%></p> -->
             <p>This takes 10 to 20 minutes. Keep the tab open or come back later to see the result in the <a href="./latest">latest renders.</a></p>
         </div>
@@ -15,6 +20,8 @@
 
             socket.on('message', (text, imgpath) => {
                 console.log("received a message");
+                document.getElementsByClassName('loadingvideo')[0].style.display = 'none';
+                document.getElementById('myimage').style.display = 'unset';
                 document.querySelector('h2').innerHTML = text;
                 document.querySelector('title').innerHTML = "Rendering finished - Birdview";
                 document.getElementById('myimage').src = imgpath;

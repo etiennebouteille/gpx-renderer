@@ -119,12 +119,12 @@ bpy.context.scene.blosm.dataType = "terrain"
 bpy.context.scene.blosm.ignoreGeoreferencing = True
 bpy.ops.blosm.import_data()
 
-# print("going to import sat data now")
+print("going to import sat data now")
 
-# bpy.context.scene.blosm.dataType = "overlay"
-# bpy.context.scene.blosm.overlayType = 'arcgis-satellite'
-# bpy.context.scene.blosm.terrainObject = 'Terrain'
-# bpy.ops.blosm.import_data()
+bpy.context.scene.blosm.dataType = "overlay"
+bpy.context.scene.blosm.overlayType = 'arcgis-satellite'
+bpy.context.scene.blosm.terrainObject = 'Terrain'
+bpy.ops.blosm.import_data()
 
 ###--- EDITING TERRAIN AND GPX MESH TO LOOK NICE ---###
 
