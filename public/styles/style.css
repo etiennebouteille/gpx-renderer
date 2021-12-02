@@ -162,6 +162,27 @@ p{
     margin: 0 auto;
 }
 
+#about a {
+    color:#bed7f1;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+h3 {
+    font-family: 'Kanit', sans-serif;
+    color:#c6ccd3;
+    margin:0;
+}
+
+#about a:hover{
+    color:#9ebbda;
+}
+
+#about p {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
 /*** LATEST ***/
 #latestContainer {
     display:flex;

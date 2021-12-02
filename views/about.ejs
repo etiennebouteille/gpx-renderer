@@ -5,19 +5,26 @@
         <%- include('./partials/header.ejs') %>
         <div id="about">
         <h2>About this website</h2>
-        <p>Birdview converts gps tracking data to a rendered map of the environment around the path. 
+        <h3>What does it do?</h3>
+        <p>Birdview converts a GPS path to a rendered map of the environment around the path. 
             The goal is to output a nice image, ready to be kept as a memory or shared with friends. 
             As opposed to other similiar tools, Birview uses raytraced rendering instead of realtime 3D. 
-            Raytraced rendering allows beautiful, physically accurate representation of light.</p>
+            Raytraced rendering allows much nicer, physically accurate representation of light.</p>
+        <h3>What is a GPX file?</h3>
+        <p>GPX (GPS Exchange Format) is a file format used to store data from outdoor activites. It stores GPS position, time and elevation at regular intervals. From 
+            that data we can recover a path an place it on a map. All modern gps watches can export GPX files. If you don't have one, you can use <a href = "https://www.strava.com">Strava</a> 
+            to record and export GPX files.
+        </p>
+        <h3>Who made this?</h3>
         <p>This website is made by me, <a href="http://etiennebouteille.com">Etienne Bouteillé</a>. I made the design, backend and frontend dev, 
             as well as all the shenanigans to automate the renders in Blender. 
             The gpx trace featured on the homepage is also mine. I use this website to view 
             my own outdoor adventure, and run it on my own server. Everyone is welcome to use 
             it but there is no guarantee it will be up tomorrow. Enjoy it while you can!</p>
-        <p>This entire website is built on top and thanks to open source technologies and data. 
+        <p>This entire website is built with open source technologies and data. 
             Thank you <a href="https://www.blender.org/">Blender</a>, <a href="https://prochitecture.gumroad.com/l/blender-osm">Blender-osm</a>, <a href="https://nodejs.org/en/">NodeJs</a>, 
             <a href="https://www.raspberrypi.org/">RaspberryPi</a>, <a href="https://www.arcgis.com/">ArcGIS</a>.
-            All the source code for this website is available on <a href="https://github.com/etiennebouteille/gpx-renderer">github</a></p>
+            All the source code for this website is available on <a href="https://github.com/etiennebouteille/gpx-renderer">Github</a>.</p>
         </div>
     </body>
 </html>
