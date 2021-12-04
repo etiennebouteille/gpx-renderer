@@ -28,13 +28,8 @@ app.get('/about', (req, res) => {
     res.render('about')
 });
 
-app.get('/socket', (req, res) => {
-    session = req.session;
-    res.send('uh');
-});
-
 app.get('/preview', (req, res) => {
-    res.render('error', {'error' : 'goo goo gaa gaa'})
+    res.render('upload')
 });
 
 app.get('/latest', (req, res) => {

@@ -217,6 +217,16 @@ h3 {
     margin:20px 0;
 }
 
+#uploadContainer a {
+    color:#f1f5fa;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+#uploadContainer a:hover {
+    color:#284f79;
+}
+
 /*** ERROR ***/
 
 #errorContainer {
@@ -261,6 +271,7 @@ h3 {
 
     .home-text{
         margin:0;
+        padding-left: 0;
     }
 
     #description {
@@ -292,13 +303,14 @@ h3 {
 
     .home-text h2 {
         font-size: 2.2em;
+        align-self: center;
     }
 
     .ctas {
         flex-direction: column;
         justify-content: center;
         width: 80%;
-        margin:20px auto;
+        margin:30px auto;
         gap:0;
     }
 
@@ -322,12 +334,16 @@ h3 {
         margin-top:10px;
     }
 
+    #uploadContainer video{
+        margin:0;
+    }
+
     #errorContainer {
         width:90%;
         margin-top: 10px;
     }
 
-    #loadingvideo {
+    .loadingvideo {
         max-width:100%;
     }
 }

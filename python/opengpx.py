@@ -201,7 +201,7 @@ print("ready to render")
 rnd = bpy.data.scenes['Scene'].render
 rnd.resolution_x = 1000
 rnd.resolution_y = 1000
-rnd.resolution_percentage = 40
+rnd.resolution_percentage = 100
 bpy.context.scene.cycles.samples = 50
 bpy.context.scene.render.tile_x = 128
 bpy.context.scene.render.tile_y = 128
