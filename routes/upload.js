@@ -16,7 +16,10 @@ const storage = multer.diskStorage({
     },
 
     filename: function(req, file, cb){
-        cb(null, Date.now() + file.originalname);
+        let fileName = file.originalname;
+        //remove spaces from filename
+        fileName = fileName.replace(/\s/g, '');
+        cb(null, Date.now() + fileName);
     }
 });
 

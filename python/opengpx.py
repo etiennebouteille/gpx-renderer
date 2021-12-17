@@ -100,7 +100,7 @@ lonVertices = int((bounds['maxlon'] - bounds['minlon']) * 3600)
 verts = (latVertices)*(lonVertices)
 
 #TODO return error if the file is too big
-maxverts = 100000
+maxverts = 300000
 if verts < maxverts:
     bpy.context.scene.blosm.terrainReductionRatio = '1'
 elif verts < (maxverts * 4):
