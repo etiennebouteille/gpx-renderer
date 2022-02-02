@@ -1,4 +1,5 @@
 import express from 'express';
+import session from 'express-session';
 import fs from 'fs';
 const app = express();
 import { createServer } from "http";
@@ -9,6 +10,8 @@ const io = new Server(server);
 import mainRouter from './routes/main.js';
 import uploadRouter from './routes/upload.js';
 
+import db from './config/database.js';
+import Render from './models/Renders.js'
 
 //register view engine
 app.set('view engine', 'ejs');
@@ -29,7 +32,7 @@ app.get('/about', (req, res) => {
 });
 
 app.get('/preview', (req, res) => {
-    res.render('upload')
+    res.render('render', {'title':'tour des aravis', 'date':Date.now()})
 });
 
 app.get('/latest', (req, res) => {
@@ -37,8 +40,18 @@ app.get('/latest', (req, res) => {
     res.render('latest', {'renders': files});
 });
 
+app.get('/renders/:id', async (req, res) => {
+    const render = await Render.findByPk(req.params.id);
+    if(render == null){
+        res.redirect('/');
+    }
+    res.render('render', {render})
+})
+
 app.get('*', function(req, res){
     res.render('error', {'error': 'This page does not exist'});
 });
+
+
 
 server.listen(port, ()=> console.log(`App started, listening on port ${port}...`))

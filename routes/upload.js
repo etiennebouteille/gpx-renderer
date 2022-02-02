@@ -5,6 +5,7 @@ import path from 'path';
 const router = express.Router();
 import { spawn } from 'child_process';
 import PQueue from 'p-queue';
+import Render from '../models/Renders.js'
 
 //Create a queue with a max number of concurent processes of 1
 const requestQueue = new PQueue({ concurrency: 1 });
@@ -93,9 +94,32 @@ export default function(io){
             //adding the new file to the render queue
             queueRender(req, io);
 
-            res.render('upload', {'filepath': req.file.path});
+            const render = {
+                filename:req.file.originalname,
+                title:req.file.originalname.slice(0, -4),
+                eventDate:Date.now(),
+                defaultTitle:true,
+                renderFinished:false
+            };
+        
+            let {filename, title, eventDate, defaultTitle, renderFinished} = render
+        
+            Render.create({
+                filename,
+                title,
+                eventDate,
+                defaultTitle,
+                renderFinished
+            })
+                .then(render => {
+                    res.redirect(`/renders/${render.id}`)
+                })
+                .catch(err => console.log("Article creation error :"  + err))
+
+            //res.render('upload', {'filepath': req.file.path});
         })
     });
+    
 
     return router;
 };
