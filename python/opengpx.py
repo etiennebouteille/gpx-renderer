@@ -206,8 +206,8 @@ bpy.context.scene.cycles.samples = 50
 bpy.context.scene.render.tile_x = 128
 bpy.context.scene.render.tile_y = 128
 
-#get gpx file name and remove "uploads/" and ".gpx" to make a nice output name
-renderpath = '/home/pi/gpx-renderer/public/renders/' + argv[0][8:-4] + '_render.png'
+#get gpx file name and remove "uploads/" and ".gpx" to make a nice output name with renderID included
+renderpath = '/home/pi/gpx-renderer/public/renders/' + argv[1] + argv[0][8:-4] + '_render.png'
 rnd.filepath = renderpath
 bpy.ops.render.render(write_still=True)
 

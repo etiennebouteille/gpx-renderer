@@ -20,28 +20,36 @@ const storage = multer.diskStorage({
         let fileName = file.originalname;
         //remove spaces from filename
         fileName = fileName.replace(/\s/g, '');
-        cb(null, Date.now() + fileName);
+        // cb(null, Date.now() + fileName);
+        cb(null, fileName);
     }
 });
 
 //main function that does the rendering and communicates with the client
-function render(req, io) {
+function render(req, io, renderID) {
 
     console.log("Beggining a new render");
 
     return new Promise(function (resolve, reject) {
         //start child process that works blender in the background
-        const pyProg = spawn('blender', ["-b", "blender/birdview_basefile.blend", "--python", "python/opengpx.py", "--", req.file.path]);
+        const pyProg = spawn('blender', ["-b", "blender/birdview_basefile.blend", "--python", "python/opengpx.py", "--", req.file.path, renderID]);
 
         //transforming the upload filepath to the render filepath
         let imgpath = req.file.path.slice(8, -4);
-        imgpath = "/renders/" + imgpath + "_render.png"
+        imgpath = "/renders/" + renderID + imgpath + "_render.png"
 
         pyProg.on('close', (code) => {
             console.log(`child process close all stdio with code ${code}, rendering done`);
             io.sockets.emit('message', "Rendering done !", imgpath);
-            resolve(code, imgpath);
-        });
+
+            Render.update({
+                renderFinished:true 
+            }, {
+                where: {id:renderID}
+            })
+
+            resolve(code);
+        })
 
         //piping the python output to the node console
         pyProg.stdout.on('data', function(data){
@@ -55,12 +63,12 @@ function render(req, io) {
 };
 
 //call this function to add a render to the queue
-async function queueRender(req, io) {
+async function queueRender(req, io, id) {
     console.log(`Queue size: ${requestQueue.size}, Pending: ${requestQueue.pending}`);
-    return requestQueue.add(() => render(req, io));
+    return requestQueue.add(() => render(req, io, id));
 }
 
-requestQueue.on('completed', (result) => {
+requestQueue.on('completed', (result, renderID) => {
     console.log(`Task finished, tasks left : ${requestQueue.pending}`);    
 	console.log(result);
 });
@@ -92,7 +100,7 @@ export default function(io){
             
             console.log("upload worked fine");
             //adding the new file to the render queue
-            queueRender(req, io);
+            // queueRender(req, io);
 
             const render = {
                 filename:req.file.originalname,
@@ -112,6 +120,7 @@ export default function(io){
                 renderFinished
             })
                 .then(render => {
+                    queueRender(req, io, render.id);
                     res.redirect(`/renders/${render.id}`)
                 })
                 .catch(err => console.log("Article creation error :"  + err))

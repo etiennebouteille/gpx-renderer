@@ -2,6 +2,11 @@ import { Sequelize } from 'sequelize';
 import db from '../config/database.js';
 
 const blogs = db.define('renders', {
+    id: {
+        type:Sequelize.INTEGER,
+        primaryKey:true,
+        autoIncrement:true
+    },
     filename: {
         type:Sequelize.STRING
     },

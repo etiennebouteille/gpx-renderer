@@ -35,23 +35,31 @@ app.get('/preview', (req, res) => {
     res.render('render', {'title':'tour des aravis', 'date':Date.now()})
 });
 
-app.get('/latest', (req, res) => {
-    let files = fs.readdirSync("./public/renders/");
-    res.render('latest', {'renders': files});
+app.get('/latest', async (req, res) => {
+    const render = await Render.findAll({
+        limit:10,
+        order:[['id', 'DESC']],
+        where: {renderFinished:true}
+    })
+    res.render('latest', {render});
 });
 
 app.get('/renders/:id', async (req, res) => {
-    const render = await Render.findByPk(req.params.id);
-    if(render == null){
-        res.redirect('/');
-    }
-    res.render('render', {render})
-})
+    await Render.findByPk(req.params.id)
+    .then( render => {
+        if(render == null){
+            res.redirect('/');
+        }
+        res.render('render', {render})
+    })
+    .catch(err => {
+        res.end();
+    })
+    
+});
 
 app.get('*', function(req, res){
     res.render('error', {'error': 'This page does not exist'});
 });
-
-
 
 server.listen(port, ()=> console.log(`App started, listening on port ${port}...`))

@@ -5,12 +5,17 @@
         <%- include('./partials/header.ejs') %>
         <div id="latestContainer">
         <h2>Latest Renders</h2>
-            <% if (renders.length > 0) { %>
-                <% for (let i = renders.length - 1; i > renders.length - 9; i-- ) { %>
-                    <% let str = "/renders/" %>
-                    <img src=<%= str.concat(renders[i]) %> >
-                <% }; %>
-            <% } %> 
+            <% render.forEach(render => { %>
+                <div>
+                    <% let str = "/renders/" + render.id %>
+                    <a href=<%= str %>>
+                    <p><%= render.title %></p>
+                    <p><%= (new Date (render.eventDate)).toLocaleDateString() %></p>
+                    <% let imgpath = render.filename.slice(0, -4) %>
+                    <img src=<%= str.concat(imgpath, '_render.png') %> >
+                    </a>
+                </div>
+            <% }); %>
         </div>
     </body>
 </html>
