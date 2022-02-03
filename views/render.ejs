@@ -4,16 +4,20 @@
     <body>
         <%- include('./partials/header.ejs') %>
         <div id="uploadContainer">
-            <h2>Upload succeful!</h2>
-            <p>Rendering in progress.</p>
-            <img id="myimage" src="" alt='an image that says loading' width=500 height=500 style="display:none;">
-            <video class="loadingvideo" width="500" height="500" autoplay loop>
-                <source src="/img/loading_anim_500_m.webm" type="video/webm" />
-                Your browser does not support the video tag.
-            </video>
-              
-            <!-- <p>Upload was a success! You uploaded the file : <%# filepath #%></p> -->
-            <p>This takes 10 to 20 minutes. Keep the tab open or come back later to see the result in the <a href="./latest">latest renders.</a></p>
+            <% if(render.renderFinished == false){ %>
+                <h2>Upload succeful!</h2>
+                <p>Rendering in progress.</p>
+                <img id="myimage" src="" alt='an image that says loading' width=500 height=500 style="display:none;">
+                <video class="loadingvideo" width="500" height="500" autoplay loop>
+                    <source src="/img/loading_anim_500_m.webm" type="video/webm" />
+                    Your browser does not support the video tag.
+                </video>                
+                <p>This takes 10 to 20 minutes. Keep the tab open or come back later to see the result in the <a href="./latest">latest renders.</a></p>
+            <% } else { %>
+                <% let str = "/renders/" + render.id %>
+                <% let imgpath = render.filename.slice(0, -4) %>                
+                <img id="myimage" src=<%= str.concat(imgpath, '_render.png')%> alt='a 3d rendering of a landscape' width=500 height=500>
+            <% }; %>
             <h1> <%= render.title %> </h1>
             <h2> <%= (new Date (render.eventDate)).toLocaleDateString() %> </h2>
         </div>
