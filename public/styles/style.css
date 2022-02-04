@@ -193,7 +193,30 @@ h3 {
 
 #latestContainer img {
     margin:10px 0;
+    width:100%;
     max-width: 100%;
+}
+
+#latestContainer p{
+    font-family: 'Kanit', sans-serif;
+    margin:0;
+    color:white;
+    font-size: 0.9em;
+    font-weight: 700;
+    margin-bottom: -5px;
+}
+
+#latestContainer h3{
+    color:white;
+    line-height: 90%;
+}
+
+.render{
+    margin-bottom:10px;
+}
+
+h2 {
+    margin-bottom: 15px;
 }
 
 /*** UPLOAD ***/
@@ -201,20 +224,30 @@ h3 {
 #uploadContainer{
     display:flex;
     flex-direction: column;
-    align-items: center;
+    align-items: left;
     width: 30%;
     margin: 0 auto;
 }
 
+#uploadContainer h2 {
+    font-weight: 700;
+    color:white;
+    margin-bottom: 0;
+    line-height: 95%;
+    font-size: 2em;
+}
+
 #uploadContainer p {
     margin: 0;
-    text-align: center;
+    font-family: 'Kanit', sans-serif;
+    font-weight: 700;
+    color:white;
 }
 
 #uploadContainer img {
     max-width: 100%;
     height: auto;
-    margin:20px 0;
+    margin:20px 0 10px;
 }
 
 #uploadContainer a {
@@ -332,6 +365,14 @@ h3 {
     #uploadContainer {
         width:90%;
         margin-top:10px;
+    }
+
+    #uploadContainer h2 {
+        font-size:1.4em;
+    }
+
+    #uploadContainer p {
+        font-size: 0.8em;
     }
 
     #uploadContainer video{

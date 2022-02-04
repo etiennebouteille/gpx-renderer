@@ -18,8 +18,8 @@
                 <% let imgpath = render.filename.slice(0, -4) %>                
                 <img id="myimage" src=<%= str.concat(imgpath, '_render.png')%> alt='a 3d rendering of a landscape' width=500 height=500>
             <% }; %>
-            <h1> <%= render.title %> </h1>
-            <h2> <%= (new Date (render.eventDate)).toLocaleDateString() %> </h2>
+            <h2> <%= render.title %> </h2>
+            <p> <%= (new Date (render.eventDate)).toLocaleDateString() %> </p>
         </div>
         <script>
             const socket = io();

@@ -6,12 +6,12 @@
         <div id="latestContainer">
         <h2>Latest Renders</h2>
             <% render.forEach(render => { %>
-                <div>
-                    <% let str = "/renders/" + render.id %>
-                    <a href=<%= str %>>
-                    <p><%= render.title %></p>
+                <% let str = "/renders/" + render.id %>
+                <div class="render">             
+                    <h3><%= render.title %></h3>
                     <p><%= (new Date (render.eventDate)).toLocaleDateString() %></p>
                     <% let imgpath = render.filename.slice(0, -4) %>
+                    <a href=<%= str %>>
                     <img src=<%= str.concat(imgpath, '_render.png') %> >
                     </a>
                 </div>
