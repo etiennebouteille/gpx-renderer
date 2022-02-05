@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express from 'express';
 import session from 'express-session';
 import fs from 'fs';
@@ -9,18 +10,51 @@ const io = new Server(server);
 
 import mainRouter from './routes/main.js';
 import uploadRouter from './routes/upload.js';
+import rendersRouter from './routes/renders.js';
 
 import db from './config/database.js';
-import Render from './models/Renders.js'
+import Render from './models/Renders.js';
+
+import pg from 'pg';
+import connectPg from 'connect-pg-simple';
+const pgSession = connectPg(session);
+
+//settings for cookies db
+const pgPool = new pg.Pool({
+    user: process.env.DBUSER,
+    host: 'localhost',
+    database: 'birdview',
+    password: process.env.DBPASSWORD,
+    port: 5432,
+});
+
+//cookies settings
+const sessionMiddleware = session({
+    store: new pgSession({
+        pool: pgPool
+    }),
+    secret:process.env.SESSIONSECRET,
+    resave:false,
+    saveUninitialized:true,
+    cookie:{
+        maxAge:1000*60*60*4, //4 heures
+        secure:false,
+        httpOnly:true
+    }
+});
 
 //register view engine
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
+app.use(sessionMiddleware);
+
+app.use(express.urlencoded({extended:false}))
 
 const port = 5000;
 
 //main routing
 app.use('/', mainRouter);
+app.use('/renders', rendersRouter);
 app.use('/upload', uploadRouter(io));
 
 io.on('connection', (socket) => {
@@ -42,20 +76,6 @@ app.get('/latest', async (req, res) => {
         where: {renderFinished:true}
     })
     res.render('latest', {render});
-});
-
-app.get('/renders/:id', async (req, res) => {
-    await Render.findByPk(req.params.id)
-    .then( render => {
-        if(render == null){
-            res.redirect('/');
-        }
-        res.render('render', {render})
-    })
-    .catch(err => {
-        res.end();
-    })
-    
 });
 
 app.get('*', function(req, res){

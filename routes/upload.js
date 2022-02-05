@@ -121,6 +121,7 @@ export default function(io){
             })
                 .then(render => {
                     queueRender(req, io, render.id);
+                    req.session.createdRender = render.id;
                     res.redirect(`/renders/${render.id}`)
                 })
                 .catch(err => console.log("Article creation error :"  + err))

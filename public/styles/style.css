@@ -237,7 +237,7 @@ h2 {
     font-size: 2em;
 }
 
-#uploadContainer p {
+#uploadContainer #date {
     margin: 0;
     font-family: 'Kanit', sans-serif;
     font-weight: 700;
@@ -258,6 +258,26 @@ h2 {
 
 #uploadContainer a:hover {
     color:#284f79;
+}
+
+/** EDITABLE PAGE **/
+
+#uploadContainer input[type=text]{
+    font-family: 'Kanit', sans-serif;
+    font-weight: 700;
+    font-size: 2em;
+    color:white;
+    border:none;
+    background-color: #181E25;
+}
+
+#uploadContainer .titleNotEdited{
+    text-decoration: underline dashed 3px;
+    text-decoration-color: white;
+}
+
+#uploadContainer .titleNotEdited:hover{
+    cursor:pointer;
 }
 
 /*** ERROR ***/

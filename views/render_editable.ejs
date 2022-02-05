@@ -18,8 +18,19 @@
                 <% let imgpath = render.filename.slice(0, -4) %>                
                 <img id="myimage" src=<%= str.concat(imgpath, '_render.png')%> alt='a 3d rendering of a landscape' width=500 height=500>
             <% }; %>
-            <h2> <%= render.title %> </h2>
-            <p id="date"> <%= (new Date (render.eventDate)).toLocaleDateString() %> </p>
+            <form action=<%= "/renders/".concat(render.id) %> method="POST">
+                <div class='form-group'>
+                    <% let titleClass = "" %>
+                    <% if (render.defaultTitle == true){ %>
+                        <% titleClass = "titleNotEdited" %>
+                        <input required type="text" name="title" id="title" class="titleNotEdited" placeholder=<% render.title %> >
+                    <% } else { %>
+                        <% titleClass = "titleEdited" %>
+                        <input required type="text" name="title" id="title" class="titleEdited" value="<%= render.title %>" >
+                    <% } %>
+                </div>
+            </form>
+            <p id="date"> <%= (new Date (render.eventDate)).toLocaleDateString() %> </p>            
         </div>
         <script>
             const socket = io();
