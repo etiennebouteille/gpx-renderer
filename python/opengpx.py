@@ -121,6 +121,9 @@ bpy.ops.blosm.import_data()
 
 print("going to import sat data now")
 
+###########################
+####  SATELLITE DATA   ####
+###########################
 bpy.context.scene.blosm.dataType = "overlay"
 bpy.context.scene.blosm.overlayType = 'arcgis-satellite'
 bpy.context.scene.blosm.terrainObject = 'Terrain'

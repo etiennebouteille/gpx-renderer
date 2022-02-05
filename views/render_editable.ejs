@@ -23,7 +23,7 @@
                     <% let titleClass = "" %>
                     <% if (render.defaultTitle == true){ %>
                         <% titleClass = "titleNotEdited" %>
-                        <input required type="text" name="title" id="title" class="titleNotEdited" placeholder=<% render.title %> >
+                        <input required type="text" name="title" id="title" class="titleNotEdited" placeholder=<%= render.title %> >
                     <% } else { %>
                         <% titleClass = "titleEdited" %>
                         <input required type="text" name="title" id="title" class="titleEdited" value="<%= render.title %>" >

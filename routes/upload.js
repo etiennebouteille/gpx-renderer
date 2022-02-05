@@ -121,7 +121,16 @@ export default function(io){
             })
                 .then(render => {
                     queueRender(req, io, render.id);
-                    req.session.createdRender = render.id;
+                    if(req.session.createdRender){
+                        let createdRenders = req.session.createdRender;
+                        console.log("createdRenders already exists");
+                        for(let i = 0; i < createdRenders.length; i++){ console.log("id : " + createdRenders[i])}
+                        createdRenders.push(render.id);
+                    } else {
+                        let createdRenders = req.session.createdRender = [];
+                        createdRenders.push(render.id);
+                    }
+                    // req.session.createdRender = render.id;
                     res.redirect(`/renders/${render.id}`)
                 })
                 .catch(err => console.log("Article creation error :"  + err))

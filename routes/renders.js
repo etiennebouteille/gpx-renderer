@@ -7,7 +7,7 @@ router.get('/:id', async (req, res) => {
     .then( render => {
         if(render == null){
             res.redirect('/');
-        } else if(req.session.createdRender == render.id){
+        } else if(req.session.createdRender.indexOf(render.id) >= 0){ //check if render id has been created by this session
             res.render('render_editable', {render})
         } else {
             res.render('render', {render})
