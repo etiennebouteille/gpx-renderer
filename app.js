@@ -11,6 +11,7 @@ const io = new Server(server);
 import mainRouter from './routes/main.js';
 import uploadRouter from './routes/upload.js';
 import rendersRouter from './routes/renders.js';
+import stravaRouter from './routes/strava.js';
 
 import db from './config/database.js';
 import Render from './models/Renders.js';
@@ -37,7 +38,7 @@ const sessionMiddleware = session({
     resave:false,
     saveUninitialized:true,
     cookie:{
-        maxAge:1000*60*60*4, //4 heures
+        maxAge:1000*60*60*24*30, //1 mois
         secure:false,
         httpOnly:true
     }
@@ -56,6 +57,7 @@ const port = 5000;
 app.use('/', mainRouter);
 app.use('/renders', rendersRouter);
 app.use('/upload', uploadRouter(io));
+app.use('/strava', stravaRouter);
 
 io.on('connection', (socket) => {
     console.log("User connected to the server : " + socket.id);
