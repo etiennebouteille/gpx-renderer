@@ -4,6 +4,8 @@ import StravaTokens from '../models/StravaTokens.js';
 import axios from 'axios';
 import url from 'url';
 import slugify from 'slugify';
+import makeGpx from '../modules/makegpx.js';
+import fs from 'fs';
 
 const router = express.Router()
 
@@ -16,7 +18,6 @@ router.get('/auth', async (req, res)=>{
         const now = Date.now();
 
         if(token.expires_at < now){
-            console.log("token expired");
             //token is expired, need to request a new one
             const reAuthBody = {
                 client_id:'77608',
@@ -39,7 +40,6 @@ router.get('/auth', async (req, res)=>{
                     res.status(500)
                 })    
         } else {       
-            console.log("token valid!!!!!!!!!!!!!!!!!");     
             res.redirect("/strava/activities");
         }        
     } else {
@@ -99,11 +99,9 @@ router.get("/create-athlete", (req, res) => {
 
 router.get('/activities', async (req, res) => {
     console.log("session strava id : " + req.session.stravaID);
-    // const access_token = await StravaTokens.findByPk(req.session.stravaID).then(token=>{return token.access_token});
-    const access_token = '244a2672c139285e622fecc38d5faa6c663e5747'
-    console.log("access token : " + access_token);
+    const access_token = await StravaTokens.findByPk(req.session.stravaID).then(token=>{return token.access_token});
 
-    axios.get("https://www.strava.com/api/v3/athlete/activities", {headers:{'Authorization':'Bearer 244a2672c139285e622fecc38d5faa6c663e5747'}})
+    axios.get("https://www.strava.com/api/v3/athlete/activities", {data:{per_page:'2'},headers:{'Authorization':'Bearer ' + access_token}})
     .then((_res) => {
             const sorties = []
             for(let i = 0; i<_res.data.length; i++){
@@ -119,13 +117,29 @@ router.get('/activities', async (req, res) => {
         })
 })
 
-// axios({
-//     method: 'get',
-//     url: 'http://www.strava.com/api/v3/athlete/activities',
-//     data: {per_page: '2'},
-//     headers: {
-//       Authorization:'Bearer ' + access_token
-//     }
-//   })
+router.get("/getgpx/:id/:name", async (req, res) => {
+    const access_token = await StravaTokens.findByPk(req.session.stravaID).then(token=>{return token.access_token});
+    axios({
+        method: 'get',
+        url: `https://www.strava.com/api/v3/activities/${req.params.id}/streams`,
+        data: {keys: 'latlng,altitude'},
+        headers: {
+          Authorization: 'Bearer ' + access_token
+        }
+      }).then((_res) => {
+          const latlon = _res.data[0].data;
+          const altitude = _res.data[2].data;
+          const gpx = makeGpx(req.params.name, latlon, altitude);
+          const filePath = "uploads/" + req.params.name + ".gpx"
+          fs.writeFile(filePath, gpx, (err) => {
+              if (err){
+                  console.log(err);
+              } else {
+                  console.log("gpx file written successfully at : " + filePath)
+              }
+          })
+          res.send("got gpx(almost)")
+      })
+})
 
 export default router;

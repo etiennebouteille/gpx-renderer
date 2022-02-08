@@ -121,6 +121,7 @@ export default function(io){
             })
                 .then(render => {
                     queueRender(req, io, render.id);
+                    //createdRender is an array of all renders created by the session
                     if(req.session.createdRender){
                         let createdRenders = req.session.createdRender;
                         console.log("createdRenders already exists");
@@ -137,8 +138,7 @@ export default function(io){
 
             //res.render('upload', {'filepath': req.file.path});
         })
-    });
-    
+    });    
 
     return router;
 };

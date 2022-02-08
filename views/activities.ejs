@@ -13,7 +13,7 @@
             <div>
                 <h2><%= sortie.name %></h2>
                 <p>ID : <%= sortie.id %></p>
-                <% let link = "/getgpx/" + sortie.id + "/" + sortie.slug %>
+                <% let link = "/strava/getgpx/" + sortie.id + "/" + sortie.slug %>
                 <form action=<%=link %>>
                     <button type="submit" class="btn btn-primary">Download gpx</button>
                 </form>
