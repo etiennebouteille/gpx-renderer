@@ -6,6 +6,10 @@ const router = express.Router();
 import { spawn } from 'child_process';
 import PQueue from 'p-queue';
 import Render from '../models/Renders.js'
+import StravaTokens from '../models/StravaTokens.js';
+import makeGpx from '../modules/makegpx.js';
+import axios from 'axios';
+import fs from 'fs';
 
 //Create a queue with a max number of concurent processes of 1
 const requestQueue = new PQueue({ concurrency: 1 });
@@ -26,16 +30,16 @@ const storage = multer.diskStorage({
 });
 
 //main function that does the rendering and communicates with the client
-function render(req, io, renderID) {
+function render(filepath, io, renderID) {
 
     console.log("Beggining a new render");
 
     return new Promise(function (resolve, reject) {
         //start child process that works blender in the background
-        const pyProg = spawn('blender', ["-b", "blender/birdview_basefile.blend", "--python", "python/opengpx.py", "--", req.file.path, renderID]);
+        const pyProg = spawn('blender', ["-b", "blender/birdview_basefile.blend", "--python", "python/opengpx.py", "--", filepath, renderID]);
 
         //transforming the upload filepath to the render filepath
-        let imgpath = req.file.path.slice(8, -4);
+        let imgpath = filepath.slice(8, -4);
         imgpath = "/renders/" + renderID + imgpath + "_render.png"
 
         pyProg.on('close', (code) => {
@@ -63,15 +67,48 @@ function render(req, io, renderID) {
 };
 
 //call this function to add a render to the queue
-async function queueRender(req, io, id) {
+async function queueRender(filepath, io, id) {
     console.log(`Queue size: ${requestQueue.size}, Pending: ${requestQueue.pending}`);
-    return requestQueue.add(() => render(req, io, id));
+    return requestQueue.add(() => render(filepath, io, id));
 }
 
 requestQueue.on('completed', (result, renderID) => {
     console.log(`Task finished, tasks left : ${requestQueue.pending}`);    
 	console.log(result);
 });
+
+//add a new render to the database and queue it to be rendered
+async function newRenderEntry(req, io, filename, filepath, title, date){
+    //if title is not defined it take filename and removes extension
+    var title = (typeof title !== 'undefined') ? title : filename.slice(0, -4);
+    var date = (typeof date !== 'undefined') ? date : Date.now();
+
+    const renderID = await Render.create({
+        filename:filename,
+        title:title,
+        eventDate:Date.now(),
+        defaultTitle:true,
+        renderFinished:false
+    })
+        .then(render => {
+            queueRender(filepath, io, render.id);
+            //createdRender is an array of all renders created by the session
+            if(req.session.createdRender){
+                let createdRenders = req.session.createdRender;
+                console.log("createdRenders already exists");
+                for(let i = 0; i < createdRenders.length; i++){ console.log("id : " + createdRenders[i])}
+                createdRenders.push(render.id);
+            } else {
+                let createdRenders = req.session.createdRender = [];
+                createdRenders.push(render.id);
+            }
+            // res.redirect(`/renders/${render.id}`)
+            return render.id
+        })
+        .catch(err => console.log("Article creation error :"  + err))
+
+        return renderID;
+}
 
 export default function(io){
 
@@ -101,26 +138,17 @@ export default function(io){
             console.log("upload worked fine");
             //adding the new file to the render queue
             // queueRender(req, io);
-
-            const render = {
+            console.log("file original name : " + req.file.originalname);
+        
+            Render.create({
                 filename:req.file.originalname,
                 title:req.file.originalname.slice(0, -4),
                 eventDate:Date.now(),
                 defaultTitle:true,
                 renderFinished:false
-            };
-        
-            let {filename, title, eventDate, defaultTitle, renderFinished} = render
-        
-            Render.create({
-                filename,
-                title,
-                eventDate,
-                defaultTitle,
-                renderFinished
             })
                 .then(render => {
-                    queueRender(req, io, render.id);
+                    queueRender(req.file.path, io, render.id);
                     //createdRender is an array of all renders created by the session
                     if(req.session.createdRender){
                         let createdRenders = req.session.createdRender;
@@ -131,14 +159,54 @@ export default function(io){
                         let createdRenders = req.session.createdRender = [];
                         createdRenders.push(render.id);
                     }
-                    // req.session.createdRender = render.id;
                     res.redirect(`/renders/${render.id}`)
                 })
                 .catch(err => console.log("Article creation error :"  + err))
 
-            //res.render('upload', {'filepath': req.file.path});
         })
-    });    
+    }); 
+    
+    //user redirect here when creating a render from strava API
+    //it downloads the activity's stream, converts it to a gpx file and add it to render queue
+    router.get("/strava/:id/:name", async (req, res) => {
+        const access_token = await StravaTokens.findByPk(req.session.stravaID).then(token=>{return token.access_token});
+        const gpxFile = await axios({
+            method: 'get',
+            url: `https://www.strava.com/api/v3/activities/${req.params.id}/streams`,
+            data: {keys: 'latlng,altitude'},
+            headers: {
+              Authorization: 'Bearer ' + access_token
+            }
+          }).then((_res) => {
+              const latlon = _res.data[0].data;
+              const altitude = _res.data[2].data;
+
+              const gpx = makeGpx(req.params.name, latlon, altitude);
+
+              const name = req.params.name + ".gpx"
+              const destination = "uploads/"
+              const path = destination.concat(name);
+
+              fs.writeFile(path, gpx, (err) => {
+                  if (err){
+                      console.log(err);
+                  } else {
+                      console.log("gpx file written successfully at : " + path)
+                  }
+              })
+
+              const file = {
+                  name,
+                  path
+              }
+
+              return file;
+          })
+          newRenderEntry(req, io, gpxFile.name, gpxFile.path, req.params.name)
+          .then(renderID => {
+            res.redirect(`/renders/${renderID}`)
+          })
+    })
 
     return router;
 };

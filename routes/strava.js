@@ -4,8 +4,7 @@ import StravaTokens from '../models/StravaTokens.js';
 import axios from 'axios';
 import url from 'url';
 import slugify from 'slugify';
-import makeGpx from '../modules/makegpx.js';
-import fs from 'fs';
+
 
 const router = express.Router()
 
@@ -23,7 +22,7 @@ router.get('/auth', async (req, res)=>{
                 client_id:'77608',
                 client_secret:process.env.STRAVA_CLIENT_SECRET,
                 grant_type:'refresh_token',
-                refresh_token:token.refreshToken
+                refresh_token:token.refresh_token
             }
             axios.post('https://www.strava.com/api/v3/oauth/token', reAuthBody)
                 .then((_res)=> {        
@@ -57,8 +56,6 @@ router.get('/oauth-callback', (req, res)=>{
     }
     axios.post('https://www.strava.com/oauth/token', body)
         .then((_res)=> {
-            // console.log("access token : " + _res.data.access_token)
-            // console.log("athlete id : " + _res.data.athlete.id);
 
             let myurl = url.format({
                 pathname:"/strava/create-athlete",
@@ -78,6 +75,7 @@ router.get('/oauth-callback', (req, res)=>{
         })    
 })
 
+//TODO store this info on the auth callback instead of here, just got to deal with the session thing
 router.get("/create-athlete", (req, res) => {
     if (req.query.athleteID) { 
     
@@ -115,31 +113,6 @@ router.get('/activities', async (req, res) => {
             console.log(_res.data)
             res.render('activities', {sorties});
         })
-})
-
-router.get("/getgpx/:id/:name", async (req, res) => {
-    const access_token = await StravaTokens.findByPk(req.session.stravaID).then(token=>{return token.access_token});
-    axios({
-        method: 'get',
-        url: `https://www.strava.com/api/v3/activities/${req.params.id}/streams`,
-        data: {keys: 'latlng,altitude'},
-        headers: {
-          Authorization: 'Bearer ' + access_token
-        }
-      }).then((_res) => {
-          const latlon = _res.data[0].data;
-          const altitude = _res.data[2].data;
-          const gpx = makeGpx(req.params.name, latlon, altitude);
-          const filePath = "uploads/" + req.params.name + ".gpx"
-          fs.writeFile(filePath, gpx, (err) => {
-              if (err){
-                  console.log(err);
-              } else {
-                  console.log("gpx file written successfully at : " + filePath)
-              }
-          })
-          res.send("got gpx(almost)")
-      })
 })
 
 export default router;
