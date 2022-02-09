@@ -95,14 +95,11 @@ async function newRenderEntry(req, io, filename, filepath, title, date){
             //createdRender is an array of all renders created by the session
             if(req.session.createdRender){
                 let createdRenders = req.session.createdRender;
-                console.log("createdRenders already exists");
-                for(let i = 0; i < createdRenders.length; i++){ console.log("id : " + createdRenders[i])}
                 createdRenders.push(render.id);
             } else {
                 let createdRenders = req.session.createdRender = [];
                 createdRenders.push(render.id);
             }
-            // res.redirect(`/renders/${render.id}`)
             return render.id
         })
         .catch(err => console.log("Article creation error :"  + err))
@@ -136,33 +133,11 @@ export default function(io){
             }
             
             console.log("upload worked fine");
-            //adding the new file to the render queue
-            // queueRender(req, io);
-            console.log("file original name : " + req.file.originalname);
-        
-            Render.create({
-                filename:req.file.originalname,
-                title:req.file.originalname.slice(0, -4),
-                eventDate:Date.now(),
-                defaultTitle:true,
-                renderFinished:false
-            })
-                .then(render => {
-                    queueRender(req.file.path, io, render.id);
-                    //createdRender is an array of all renders created by the session
-                    if(req.session.createdRender){
-                        let createdRenders = req.session.createdRender;
-                        console.log("createdRenders already exists");
-                        for(let i = 0; i < createdRenders.length; i++){ console.log("id : " + createdRenders[i])}
-                        createdRenders.push(render.id);
-                    } else {
-                        let createdRenders = req.session.createdRender = [];
-                        createdRenders.push(render.id);
-                    }
-                    res.redirect(`/renders/${render.id}`)
-                })
-                .catch(err => console.log("Article creation error :"  + err))
 
+            newRenderEntry(req, io, req.file.originalname, req.file.path)
+            .then(renderID => {
+            res.redirect(`/renders/${renderID}`)
+            })
         })
     }); 
     
@@ -199,7 +174,6 @@ export default function(io){
                   name,
                   path
               }
-
               return file;
           })
           newRenderEntry(req, io, gpxFile.name, gpxFile.path, req.params.name)

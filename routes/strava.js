@@ -43,7 +43,7 @@ router.get('/auth', async (req, res)=>{
         }        
     } else {
         //send user to conect their Strava
-        res.redirect('http://www.strava.com/oauth/authorize?client_id=77608&response_type=code&redirect_uri=http://192.168.1.4:5000/strava/oauth-callback&approval_prompt=force&scope=activity:read');
+        res.redirect('http://www.strava.com/oauth/authorize?client_id=77608&response_type=code&redirect_uri=http://birdview.etiennebouteille.com/strava/oauth-callback&approval_prompt=force&scope=activity:read');
     }
 })
 
@@ -99,13 +99,16 @@ router.get('/activities', async (req, res) => {
     console.log("session strava id : " + req.session.stravaID);
     const access_token = await StravaTokens.findByPk(req.session.stravaID).then(token=>{return token.access_token});
 
-    axios.get("https://www.strava.com/api/v3/athlete/activities", {data:{per_page:'2'},headers:{'Authorization':'Bearer ' + access_token}})
+    axios.get("https://www.strava.com/api/v3/athlete/activities", {data:{per_page:'7'},headers:{'Authorization':'Bearer ' + access_token}})
     .then((_res) => {
             const sorties = []
             for(let i = 0; i<_res.data.length; i++){
                 let current = {
                     name:_res.data[i].name,
                     id:_res.data[i].id,
+                    type:_res.data[i].type,
+                    distance:Math.round(_res.data[i].distance * 0.001),
+                    date:_res.data[i].start_date,
                     slug:slugify(_res.data[i].name)
                 }
                 sorties.push(current)

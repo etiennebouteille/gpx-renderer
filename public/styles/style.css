@@ -34,6 +34,10 @@ h2{
     margin:0;
 }
 
+a {
+    text-decoration: none;
+}
+
 .home-text h2 {
     font-size: 3vw;
 }
@@ -48,6 +52,7 @@ body{
     align-items: center;
     margin:0 auto;
     margin-top: 5%;
+    gap:5%;
 }
 
 .home-text{
@@ -94,19 +99,23 @@ p{
 
 .uploadButton{
     font-family: 'Kanit', sans-serif;
-    font-weight: 700;
+    font-weight: 500;
     display: inline-block;
     margin: 0;
     border-width: 0;
-    padding: 12px 35px 14px 35px;
+    padding: 12px 40px 14px 40px;
     max-width: 100%;
     color: #181E25;
     font-size: 18px;
     text-align: center;
-    border-radius: 20px;
+    border-radius: 4px;
     background: #ACCDF0;
     cursor: pointer;
     transition: all 0.3s ease;
+}
+
+.uploadButtonFlex {
+    flex-shrink:0;
 }
 
 .uploadButton:hover{
@@ -114,35 +123,46 @@ p{
 }
 
 .buttontext {
-    transition: all 0.3s ease;
+    transition: all 0.5s ease;
+    position:relative;
 }
 
-.seelastest{
+.connectStrava{
     font-family: 'Kanit', sans-serif;
-    font-weight: 700;
+    font-weight: 500;
     display: inline-block;
     margin: 0;
     /* margin-left: 20px; */
     border-width: 0;
-    padding: 10px 33px 12px 33px;
+    padding: 10px 10px 12px 10px;
     max-width: 100%;
-    color: #C6CCD3;
+    color: #FFFFFF;
     font-size: 18px;
     text-align: center;
-    border-radius: 20px;
-    background: #181E25;
+    border-radius: 4px;
+    background: #FC4C02;
     text-decoration: none;
-    border: 3px solid #ACCDF0;
-    transition: all 0.3s ease;
+    border: 3px solid #FC4C02;
+    transition: all 0.5s ease;
 }
 
-.seelastest:hover{
-    border:3px solid #506172;
-    
+.connectStrava svg{
+    fill:#ffffff;
+    width:28%;
+    transition: all 0.5s ease;
+    vertical-align: auto;
+    margin-left: 0.11em;
+    vertical-align: -5%;
 }
 
-.seelastest:hover .buttontext{
-    transform:translateX(5px);
+.connectStrava:hover {
+    color:#FC4C02;
+    background:#FFFFFF;
+    border-color:#FFFFFF;
+}
+
+.connectStrava:hover svg {
+    fill: #FC4C02;
 }
 
 .ctas{
@@ -150,7 +170,15 @@ p{
     margin-top: 30px;
     display: flex;
     gap: 20px;
-    justify-content: flex-end;
+    /* justify-content: flex-end; */
+    justify-content: space-between;
+}
+
+#seelatest {
+    width: 75%;
+    text-align: center;
+    margin-top:2.5em;
+    align-self: center;
 }
 
 /*** ABOUT ***/
@@ -258,6 +286,78 @@ h2 {
 
 #uploadContainer a:hover {
     color:#284f79;
+}
+
+/** ACTIVITIES **/
+
+#activitiesTitle {
+    color:white;
+    margin-left: 10%;
+}
+
+#activities {
+    display:flex;
+    flex-wrap:wrap;
+    width:80%;
+    justify-content: flex-start;
+    margin:auto;
+    gap:2%;
+    row-gap:20px;
+}
+
+.activityCard {
+    font-family: 'Kanit', sans-serif;
+    background-color: #FC4C02;
+    border-radius: 4px;
+    height:6em;
+    flex-grow:0;
+    flex-shrink: 0;
+    flex-basis:45%;
+    padding:15px;
+    padding-top: 0;
+    box-shadow: 0 4px 8px rgb(0 0 0 / 0.05);
+    transition: all 0.7s ease;
+}
+
+.activityCard:hover {
+    background-color: white;
+}
+
+.activityContainer {
+    position:relative;
+}
+
+.activityCard h3 {
+    color:white;
+    font-weight:700;
+    font-size:2.4em;
+    text-decoration: none;
+    transition: all 0.7s ease;
+}
+
+.activityCard p {
+    color:white;
+    font-family: 'Kanit', sans-serif;
+    margin:0;
+    transition: all 0.7s ease;
+}
+
+.activityCard:hover p, .activityCard:hover h3 {
+    color:#FC4C02
+}
+
+.activityCard .date {
+    text-align:right;
+    font-weight:300;
+    position:relative;
+    top:-5.5em;
+}
+
+.activityCard .type {
+    font-weight:400;
+}
+.activityCard .distance {
+    font-weight:700;
 }
 
 /** EDITABLE PAGE **/
