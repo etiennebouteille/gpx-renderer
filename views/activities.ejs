@@ -9,7 +9,7 @@
             <% let link = "/upload/strava/" + sortie.id + "/" + sortie.slug %>
             <a href=<%= link %> class="activityCard">
                 <div class="activityContainer">
-                    <% let maxTitleLength = 24; %>
+                    <% let maxTitleLength = 29; %>
                     <% let shortString = ""; %>
                     <% if(sortie.name.length > maxTitleLength){ %>
                         <% shortString = sortie.name.substring(0, maxTitleLength - 3) + "..."; %>
@@ -17,7 +17,17 @@
                         <% shortString = sortie.name %>
                     <% }; %>
                     <h3><%= shortString%></h3>
-                    <p class="type"><%= sortie.type %></p>                
+                    <% let faClass=""    %>
+                    <% if(sortie.type === "Ride"){ %>
+                        <% faClass = "fa-solid fa-person-biking" %>
+                    <% }  else if(sortie.type === "BackcountrySki") {%>
+                        <% faClass = "fa-solid fa-person-skiing-nordic" %>
+                    <% }  else if(sortie.type === "Run") {%>
+                        <% faClass = "fa-solid fa-person-running" %>
+                    <% }  else {%>
+                        <% faClass = "fa-solid fa-heart-pulse" %>
+                    <% } %>
+                    <p class="type"><i class="<%= faClass %>" ></i>   <%= sortie.type %></p>                
                     <p class="distance"><%= sortie.distance %>km</p> 
                     
                     <p class="date"><%= (new Date (sortie.date)).toLocaleDateString()%></p> 

@@ -20,7 +20,7 @@ h1 a{
 }
 
 #aboutmenu{
-    font-family: 'Nunito Sans', sans-serif;
+    font-family: 'Nunito', sans-serif;
     text-decoration:none;
     color:#FFFFFF;
     margin-right: 20px;
@@ -64,14 +64,14 @@ body{
 }
 
 #description {
-    font-family: 'Nunito Sans', sans-serif;
+    font-family: 'Nunito', sans-serif;
     font-size: 20px;
     margin:0;
     width:90%;
 }
 
 p{
-    font-family: 'Nunito Sans', sans-serif;
+    font-family: 'Nunito', sans-serif;
     color: #C6CCD3;
 }
 
@@ -288,33 +288,37 @@ h2 {
     color:#284f79;
 }
 
-/** ACTIVITIES **/
+/** STRAVA ACTIVITIES **/
 
 #activitiesTitle {
+    font-family: 'Nunito', sans-serif;
+    font-size:1.9em;
+    font-weight: 800;
+    margin-top:20px;
     color:white;
-    margin-left: 10%;
+    margin-left: 12.5%;
 }
 
 #activities {
     display:flex;
     flex-wrap:wrap;
-    width:80%;
+    width:75%;
     justify-content: flex-start;
     margin:auto;
-    gap:2%;
-    row-gap:20px;
+    gap:1.5%;
+    row-gap:16px;
 }
 
 .activityCard {
     font-family: 'Kanit', sans-serif;
     background-color: #FC4C02;
-    border-radius: 4px;
+    border-radius: 6px;
     height:6em;
     flex-grow:0;
     flex-shrink: 0;
-    flex-basis:45%;
+    flex-basis:46%;
     padding:15px;
-    padding-top: 0;
+    padding-top: 5px;
     box-shadow: 0 4px 8px rgb(0 0 0 / 0.05);
     transition: all 0.7s ease;
 }
@@ -330,7 +334,8 @@ h2 {
 .activityCard h3 {
     color:white;
     font-weight:700;
-    font-size:2.4em;
+    font-size:2em;
+    line-height: 1.3em;
     text-decoration: none;
     transition: all 0.7s ease;
 }
@@ -350,7 +355,7 @@ h2 {
     text-align:right;
     font-weight:300;
     position:relative;
-    top:-5.5em;
+    top:-5em;
 }
 
 .activityCard .type {
@@ -400,7 +405,7 @@ h2 {
     #home {
         background-image: url("../img/closeup_mobile.png");
         background-repeat: no-repeat;
-        background-position: center top;
+        background-position: center top -100px;
         background-size: 100% auto;
     }
     #latestContainer{
@@ -419,7 +424,7 @@ h2 {
         justify-content: center;
         text-align: center;
         margin:0 auto;
-        margin-top:120%;
+        margin-top:90%;
     }
 
     .home-text{
@@ -468,10 +473,14 @@ h2 {
     }
 
     .uploadButton {
-        width:80%;
+        width:74%;
         margin:0;
         padding:12px 35px 14px 35px;
-        border-radius: 30px;
+        border-radius: 4px;
+    }
+
+    .connectStrava{
+        margin-top: 10px;
     }
 
     .seelastest {
@@ -480,6 +489,10 @@ h2 {
         margin-left:0px;
         border-radius: 30px;
         padding:11px 34px 13px 34px;
+    }
+
+    #seelatest {
+        margin-top:0;   
     }
 
     #uploadContainer {
@@ -506,5 +519,37 @@ h2 {
 
     .loadingvideo {
         max-width:100%;
+    }
+
+    #activities {
+        width:90%;
+        row-gap: 13px;
+    }
+
+    .activityCard {
+        flex-basis:92%;
+        height:4.5em;
+        border-radius: 3px;
+        padding:10px;
+        padding-top: 5px;
+    }
+
+    .activityCard p {
+        font-size: 0.9em;
+    }
+
+    .activityCard h3 {
+        font-size: 1.1em;
+        line-height: 1.5em;
+    }
+
+    .activityCard .date {
+        font-size: 0.8em;
+        top:-5.3em;
+    }
+
+    #activitiesTitle {
+        font-size:1.4em;
+        margin-left: 5%;
     }
 }
