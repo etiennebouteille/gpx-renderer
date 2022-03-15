@@ -1,0 +1,34 @@
+<script>
+    const socket = io();
+
+    socket.on('success', (text, imgpath) => {
+        console.log("received a message");
+        document.getElementsByClassName('loadingvideo')[0].style.display = 'none';
+        document.getElementById('myimage').style.display = 'unset';
+        document.querySelector('h2').innerHTML = text;
+        document.querySelector('title').innerHTML = "Rendering finished - Birdview";
+        document.getElementById('myimage').src = imgpath;
+        document.getElementById('myimage').alt = "rendu de la trace gpx";
+        const progress = document.querySelectorAll('.inprogress');
+
+        progress.forEach(element => {
+            element.style.display = 'none';
+        });
+    });
+
+    socket.on('fail', (text) => {
+        console.log("received a message");
+        document.getElementsByClassName('loadingvideo')[0].style.display = 'none';
+        document.getElementById('myimage').style.display = 'unset';
+        document.querySelector('h2').innerHTML = text;
+        document.querySelector('title').innerHTML = "Rendering failed - Birdview";
+        document.getElementById('myimage').src = "/img/trounoir.png";
+        document.getElementById('myimage').alt = "a mountain with a black hole"
+        const progress = document.querySelectorAll('.inprogress');
+
+        progress.forEach(element => {
+            element.style.display = 'none';
+        });
+    })
+
+</script>

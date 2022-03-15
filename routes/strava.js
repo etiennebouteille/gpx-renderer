@@ -9,7 +9,8 @@ import slugify from 'slugify';
 const router = express.Router()
 
 router.get('/auth', async (req, res)=>{
-    //check if user already has connected their Strava TODO: handle rejection
+    //TODO: handle rejection
+    //check if user already has connected their Strava 
     if(req.session.stravaID){
 
         //check if access token is still valid
@@ -43,7 +44,8 @@ router.get('/auth', async (req, res)=>{
         }        
     } else {
         //send user to conect their Strava
-        res.redirect('http://www.strava.com/oauth/authorize?client_id=77608&response_type=code&redirect_uri=http://birdview.etiennebouteille.com/strava/oauth-callback&approval_prompt=force&scope=activity:read');
+        //was http
+        res.redirect('https://www.strava.com/oauth/authorize?client_id=77608&response_type=code&redirect_uri=http://birdview.etiennebouteille.com/strava/oauth-callback&approval_prompt=force&scope=activity:read');
     }
 })
 
@@ -99,7 +101,7 @@ router.get('/activities', async (req, res) => {
     console.log("session strava id : " + req.session.stravaID);
     const access_token = await StravaTokens.findByPk(req.session.stravaID).then(token=>{return token.access_token});
 
-    axios.get("https://www.strava.com/api/v3/athlete/activities", {data:{per_page:'7'},headers:{'Authorization':'Bearer ' + access_token}})
+    axios.get("https://www.strava.com/api/v3/athlete/activities", {params:{per_page:7}, headers:{'Authorization':'Bearer ' + access_token}})
     .then((_res) => {
             const sorties = []
             for(let i = 0; i<_res.data.length; i++){

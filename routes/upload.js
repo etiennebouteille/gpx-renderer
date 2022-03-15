@@ -43,15 +43,21 @@ function render(filepath, io, renderID) {
         imgpath = "/renders/" + renderID + imgpath + "_render.png"
 
         pyProg.on('close', (code) => {
-            console.log(`child process close all stdio with code ${code}, rendering done`);
-            io.sockets.emit('message', "Rendering done !", imgpath);
+            if(code == 123){
+                console.log(`child process close all stdio with code ${code}, rendering done`);
 
-            Render.update({
-                renderFinished:true 
-            }, {
-                where: {id:renderID}
-            })
+                io.sockets.emit('success', "Rendering done !", imgpath);
 
+                Render.update({
+                    renderFinished:true 
+                }, {
+                    where: {id:renderID}
+                })
+            } else {
+                console.log("render failed")
+                io.sockets.emit('fail', "Rendering failed, sorry!");                
+            }
+            
             resolve(code);
         })
 
@@ -148,7 +154,7 @@ export default function(io){
         const gpxFile = await axios({
             method: 'get',
             url: `https://www.strava.com/api/v3/activities/${req.params.id}/streams`,
-            data: {keys: 'latlng,altitude'},
+            params: {keys: 'latlng,altitude'},
             headers: {
               Authorization: 'Bearer ' + access_token
             }

@@ -15,19 +15,6 @@
             <!-- <p>Upload was a success! You uploaded the file : <%# filepath #%></p> -->
             <p>This takes 10 to 20 minutes. Keep the tab open or come back later to see the result in the <a href="./latest">latest renders.</a></p>
         </div>
-        <script>
-            const socket = io();
-
-            socket.on('message', (text, imgpath) => {
-                console.log("received a message");
-                document.getElementsByClassName('loadingvideo')[0].style.display = 'none';
-                document.getElementById('myimage').style.display = 'unset';
-                document.querySelector('h2').innerHTML = text;
-                document.querySelector('title').innerHTML = "Rendering finished - Birdview";
-                document.getElementById('myimage').src = imgpath;
-                document.getElementById('myimage').alt = "rendu de la trace gpx"
-            });
-
-        </script>
+        <%- include('./partials/renderPageSocketScript') %>
     </body>
 </html>

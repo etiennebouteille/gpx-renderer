@@ -6,13 +6,13 @@
         <div id="uploadContainer">
             <% if(render.renderFinished == false){ %>
                 <h2>Upload succeful!</h2>
-                <p>Rendering in progress.</p>
+                <p class="inprogress">Rendering in progress.</p>
                 <img id="myimage" src="" alt='an image that says loading' width=500 height=500 style="display:none;">
                 <video class="loadingvideo" width="500" height="500" autoplay loop>
                     <source src="/img/loading_anim_500_m.webm" type="video/webm" />
                     Your browser does not support the video tag.
                 </video>                
-                <p>This takes 10 to 20 minutes. Keep the tab open or come back later to see the result in the <a href="./latest">latest renders.</a></p>
+                <p class="inprogress">This takes 10 to 20 minutes. Keep the tab open or come back later to see the result in the <a href="./latest">latest renders.</a></p>
             <% } else { %>
                 <% let str = "/renders/" + render.id %>
                 <% let imgpath = render.filename.slice(0, -4) %>                
@@ -21,19 +21,6 @@
             <h2> <%= render.title %> </h2>
             <p id="date"> <%= (new Date (render.eventDate)).toLocaleDateString() %> </p>
         </div>
-        <script>
-            const socket = io();
-
-            socket.on('message', (text, imgpath) => {
-                console.log("received a message");
-                document.getElementsByClassName('loadingvideo')[0].style.display = 'none';
-                document.getElementById('myimage').style.display = 'unset';
-                document.querySelector('h2').innerHTML = text;
-                document.querySelector('title').innerHTML = "Rendering finished - Birdview";
-                document.getElementById('myimage').src = imgpath;
-                document.getElementById('myimage').alt = "rendu de la trace gpx"
-            });
-
-        </script>
+        <%- include('./partials/renderPageSocketScript') %>
     </body>
 </html>
