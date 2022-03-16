@@ -565,6 +565,10 @@ h2 {
     #activities {
         width:90%;
         row-gap: 13px;
+        height:90%;
+        overflow:hidden;
+        overflow-y:scroll;
+        padding-top:8px;
     }
 
     .activityCard {
@@ -592,6 +596,8 @@ h2 {
     #activitiesTitle {
         font-size:1.4em;
         margin-left: 5%;
+        margin-top:10px;
+        margin-bottom: 0;
     }
 
     #activities-nav{
@@ -601,5 +607,29 @@ h2 {
 
     #activities-nav{
         margin-bottom: 10px;
+    }
+
+    #activitiesBody{
+        background-image: url("../img/closeup_mobile.png");
+        background-repeat: no-repeat;
+        background-position: center top -100px;
+        background-size: 100% auto;
+        margin:0;
+    }
+
+    #activitiesContainer{
+        background-color: #181E25;
+        border-radius: 8px;
+        position:absolute;
+        top:17vh;
+        padding-top:1px;
+        height:83%;
+    }
+
+    #activitiesContainer hr{
+        border: 0;
+        border-top: 0.8px solid #54606D;
+        width:75%;
+        margin-bottom:0;
     }
 }

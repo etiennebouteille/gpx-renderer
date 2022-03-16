@@ -1,46 +1,49 @@
 <!DOCTYPE html>
 <html>
     <%- include('./partials/head.ejs', {title:"Activities"}) %>
-    <body>
+    <body id="activitiesBody">
     <%- include('./partials/header.ejs') %>
-    <h2 id="activitiesTitle">Select an activity to render</h2>
-    <div id="activities">
-        <% sorties.forEach( sortie => { %>
-            <% let link = "/upload/strava/" + sortie.id + "/" + sortie.slug %>
-            <a href=<%= link %> class="activityCard">
-                <div class="activityContainer">
-                    <% let maxTitleLength = 29; %>
-                    <% let shortString = ""; %>
-                    <% if(sortie.name.length > maxTitleLength){ %>
-                        <% shortString = sortie.name.substring(0, maxTitleLength - 3) + "..."; %>
-                    <% } else {  %>
-                        <% shortString = sortie.name %>
-                    <% }; %>
-                    <h3><%= shortString%></h3>
-                    <% let faClass=""    %>
-                    <% if(sortie.type === "Ride"){ %>
-                        <% faClass = "fa-solid fa-person-biking" %>
-                    <% }  else if(sortie.type === "BackcountrySki") {%>
-                        <% faClass = "fa-solid fa-person-skiing-nordic" %>
-                    <% }  else if(sortie.type === "Run") {%>
-                        <% faClass = "fa-solid fa-person-running" %>
-                    <% }  else {%>
-                        <% faClass = "fa-solid fa-heart-pulse" %>
-                    <% } %>
-                    <p class="type"><i class="<%= faClass %>" ></i>   <%= sortie.type %></p>                
-                    <p class="distance"><%= sortie.distance %>km</p> 
-                    
-                    <p class="date"><%= (new Date (sortie.date)).toLocaleDateString()%></p> 
-                </div>
-            </a>
-        <% }); %>
-        <div id="activities-nav">
-            <% const previousPage = parseInt(page) + 1 %>
-            <% const olderLink = (page == 1) ? "activities/" + previousPage : "../../strava/activities/" + previousPage %>
-            <a href=<%= olderLink %> id="older"></i>Older</a>
-            <% const nextPage = parseInt(page) - 1  %>
-            <% const newerLink = (page == 2) ? "../../strava/activities" : "../../strava/activities/" + nextPage %>
-            <a href=<%= newerLink %> id="newer">Newer</a>
+    <div id="activitiesContainer">
+        <h2 id="activitiesTitle">Pick an activity</h2>
+        <hr>
+        <div id="activities">
+            <% sorties.forEach( sortie => { %>
+                <% let link = "/upload/strava/" + sortie.id + "/" + sortie.slug %>
+                <a href=<%= link %> class="activityCard">
+                    <div class="activityContainer">
+                        <% let maxTitleLength = 29; %>
+                        <% let shortString = ""; %>
+                        <% if(sortie.name.length > maxTitleLength){ %>
+                            <% shortString = sortie.name.substring(0, maxTitleLength - 3) + "..."; %>
+                        <% } else {  %>
+                            <% shortString = sortie.name %>
+                        <% }; %>
+                        <h3><%= shortString%></h3>
+                        <% let faClass=""    %>
+                        <% if(sortie.type === "Ride"){ %>
+                            <% faClass = "fa-solid fa-person-biking" %>
+                        <% }  else if(sortie.type === "BackcountrySki") {%>
+                            <% faClass = "fa-solid fa-person-skiing-nordic" %>
+                        <% }  else if(sortie.type === "Run") {%>
+                            <% faClass = "fa-solid fa-person-running" %>
+                        <% }  else {%>
+                            <% faClass = "fa-solid fa-heart-pulse" %>
+                        <% } %>
+                        <p class="type"><i class="<%= faClass %>" ></i>   <%= sortie.type %></p>                
+                        <p class="distance"><%= sortie.distance %>km</p> 
+                        
+                        <p class="date"><%= (new Date (sortie.date)).toLocaleDateString()%></p> 
+                    </div>
+                </a>
+            <% }); %>
+            <div id="activities-nav">
+                <% const previousPage = parseInt(page) + 1 %>
+                <% const olderLink = (page == 1) ? "activities/" + previousPage : "../../strava/activities/" + previousPage %>
+                <a href=<%= olderLink %> id="older"></i>Older</a>
+                <% const nextPage = parseInt(page) - 1  %>
+                <% const newerLink = (page == 2) ? "../../strava/activities" : "../../strava/activities/" + nextPage %>
+                <a href=<%= newerLink %> id="newer">Newer</a>
+            </div>
         </div>
     </div>
 </body>
