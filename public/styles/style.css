@@ -134,7 +134,7 @@ p{
     margin: 0;
     /* margin-left: 20px; */
     border-width: 0;
-    padding: 10px 10px 12px 10px;
+    padding: 10px 6px 12px 6px;
     max-width: 100%;
     color: #FFFFFF;
     font-size: 18px;
@@ -153,6 +153,7 @@ p{
     vertical-align: auto;
     margin-left: 0.11em;
     vertical-align: -5%;
+    max-height: 28px;
 }
 
 .connectStrava:hover {
@@ -365,6 +366,45 @@ h2 {
     font-weight:700;
 }
 
+#activities-nav{
+    display:flex;
+    justify-content:center;
+    align-items: center;
+    height:6em;
+    flex-grow:0;
+    flex-shrink: 0;
+    flex-basis:46%;
+    padding-top: 5px;
+    background-color: #181E25;
+    gap:10%;
+}
+
+#activities-nav a {
+    font-family: 'Nunito', sans-serif;
+    font-weight:800;
+    color:white;
+}
+
+#older::before {
+    content: "\A";
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(135deg);
+    -webkit-transform: rotate(135deg);
+}
+
+#newer::after {
+    content: "\A";
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+}
+
 /** EDITABLE PAGE **/
 
 #uploadContainer input[type=text]{
@@ -552,5 +592,14 @@ h2 {
     #activitiesTitle {
         font-size:1.4em;
         margin-left: 5%;
+    }
+
+    #activities-nav{
+        flex-basis:98%;
+        height:2.2em;
+    }
+
+    #activities-nav{
+        margin-bottom: 10px;
     }
 }

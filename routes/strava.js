@@ -97,11 +97,23 @@ router.get("/create-athlete", (req, res) => {
     }    
 })
 
-router.get('/activities', async (req, res) => {
-    console.log("session strava id : " + req.session.stravaID);
+router.get('/activities/:page', async(req, res)=>{
     const access_token = await StravaTokens.findByPk(req.session.stravaID).then(token=>{return token.access_token});
 
-    axios.get("https://www.strava.com/api/v3/athlete/activities", {params:{per_page:7}, headers:{'Authorization':'Bearer ' + access_token}})
+    const sorties = await getActivities(access_token, req.params.page)
+    res.render('activities', {sorties, page:req.params.page});
+})
+
+router.get('/activities', async (req, res) => {
+    const access_token = await StravaTokens.findByPk(req.session.stravaID).then(token=>{return token.access_token});
+
+    const sorties = await getActivities(access_token, 1)
+    res.render('activities', {sorties, page:1});
+})
+
+//return an array of activities from the users account
+async function getActivities(access_token, page){
+    let data = await axios.get("https://www.strava.com/api/v3/athlete/activities", {params:{per_page:7, page}, headers:{'Authorization':'Bearer ' + access_token}})
     .then((_res) => {
             const sorties = []
             for(let i = 0; i<_res.data.length; i++){
@@ -116,8 +128,10 @@ router.get('/activities', async (req, res) => {
                 sorties.push(current)
             }         
             console.log(_res.data)
-            res.render('activities', {sorties});
+            return sorties
         })
-})
+
+    return data
+}
 
 export default router;

@@ -34,6 +34,14 @@
                 </div>
             </a>
         <% }); %>
+        <div id="activities-nav">
+            <% const previousPage = parseInt(page) + 1 %>
+            <% const olderLink = (page == 1) ? "activities/" + previousPage : "../../strava/activities/" + previousPage %>
+            <a href=<%= olderLink %> id="older"></i>Older</a>
+            <% const nextPage = parseInt(page) - 1  %>
+            <% const newerLink = (page == 2) ? "../../strava/activities" : "../../strava/activities/" + nextPage %>
+            <a href=<%= newerLink %> id="newer">Newer</a>
+        </div>
     </div>
 </body>
 </html>
