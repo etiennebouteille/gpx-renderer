@@ -51,8 +51,8 @@ bounds = gpx.get_bounds()
 
 bounds = {'minlat' : bounds.min_latitude, 'maxlat' : bounds.max_latitude, 'minlon' : bounds.min_longitude, 'maxlon' : bounds.max_longitude}
 
+
 print(bounds)
-# print("bounds :" + bounds)
 
 
 ###--- PROCESSING COORDONATES TO DFINE TERRAIN BOUNDARIES ---###
@@ -75,9 +75,10 @@ elif maxSize == lonSize:
     bounds['minlat'] = bounds['minlat'] - kmToLat(d/2)
     bounds['maxlat'] = bounds['maxlat'] + kmToLat(d/2)
 
-#make the terrain a bit larger than the bounds of the trace
-bordure = min(maxSize * 0.1, 5)
 
+#make the terrain a bit larger than the bounds of the trace
+print("max size : " + str(maxSize))
+bordure = min(maxSize * 0.1, 5)
 for k, v in bounds.items():
     if k == 'minlat':
         bounds[k] = v - kmToLat(bordure)
@@ -130,10 +131,10 @@ print("going to import sat data now")
 ###########################
 ####  SATELLITE DATA   ####
 ###########################
-bpy.context.scene.blosm.dataType = "overlay"
-bpy.context.scene.blosm.overlayType = 'arcgis-satellite'
-bpy.context.scene.blosm.terrainObject = 'Terrain'
-bpy.ops.blosm.import_data()
+# bpy.context.scene.blosm.dataType = "overlay"
+# bpy.context.scene.blosm.overlayType = 'arcgis-satellite'
+# bpy.context.scene.blosm.terrainObject = 'Terrain'
+# bpy.ops.blosm.import_data()
 
 ###--- EDITING TERRAIN AND GPX MESH TO LOOK NICE ---###
 
@@ -210,7 +211,7 @@ print("ready to render")
 rnd = bpy.data.scenes['Scene'].render
 rnd.resolution_x = 1000
 rnd.resolution_y = 1000
-rnd.resolution_percentage = 100
+rnd.resolution_percentage = 20
 bpy.context.scene.cycles.samples = 50
 bpy.context.scene.render.tile_x = 128
 bpy.context.scene.render.tile_y = 128

@@ -109,7 +109,7 @@ p{
     font-size: 18px;
     text-align: center;
     border-radius: 4px;
-    background: #ACCDF0;
+    background: #C0D1E5;
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -123,7 +123,7 @@ p{
 }
 
 .buttontext {
-    transition: all 0.5s ease;
+    /* transition: all 0.5s ease; */
     position:relative;
 }
 
@@ -134,7 +134,7 @@ p{
     margin: 0;
     /* margin-left: 20px; */
     border-width: 0;
-    padding: 10px 6px 12px 6px;
+    padding: 10px 5px 12px 5px;
     max-width: 100%;
     color: #FFFFFF;
     font-size: 18px;
@@ -180,6 +180,15 @@ p{
     text-align: center;
     margin-top:2.5em;
     align-self: center;
+}
+
+#seelatest a {
+    color: #1A60B7;
+    text-decoration:underline;
+}
+
+#seelatest a:visited{
+    color:#1A60B7;
 }
 
 /*** ABOUT ***/
@@ -362,7 +371,11 @@ h2 {
 .activityCard .type {
     font-weight:400;
 }
+.activityCard .type i{
+    margin-right:3px;
+}
 .activityCard .distance {
+    margin-top:2px;
     font-weight:700;
 }
 
@@ -403,6 +416,10 @@ h2 {
     padding: 3px;
     transform: rotate(-45deg);
     -webkit-transform: rotate(-45deg);
+}
+
+#activitiesContainer hr{
+    display:none;
 }
 
 /** EDITABLE PAGE **/
@@ -522,6 +539,7 @@ h2 {
 
     .connectStrava{
         margin-top: 10px;
+        padding: 10px 9px 12px 9px;
     }
 
     .seelastest {
@@ -584,13 +602,13 @@ h2 {
     }
 
     .activityCard h3 {
-        font-size: 1.1em;
-        line-height: 1.5em;
+        font-size: 1.2em;
+        line-height: 1.6em;
     }
 
     .activityCard .date {
-        font-size: 0.8em;
-        top:-5.3em;
+        font-size: 0.7em;
+        top:-5.9em;
     }
 
     #activitiesTitle {
@@ -627,6 +645,7 @@ h2 {
     }
 
     #activitiesContainer hr{
+        display:block;
         border: 0;
         border-top: 0.8px solid #54606D;
         width:75%;
