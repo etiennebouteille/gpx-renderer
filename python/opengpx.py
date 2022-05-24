@@ -130,10 +130,10 @@ print("going to import sat data now")
 ###########################
 ####  SATELLITE DATA   ####
 ###########################
-bpy.context.scene.blosm.dataType = "overlay"
-bpy.context.scene.blosm.overlayType = 'arcgis-satellite'
-bpy.context.scene.blosm.terrainObject = 'Terrain'
-bpy.ops.blosm.import_data()
+# bpy.context.scene.blosm.dataType = "overlay"
+# bpy.context.scene.blosm.overlayType = 'arcgis-satellite'
+# bpy.context.scene.blosm.terrainObject = 'Terrain'
+# bpy.ops.blosm.import_data()
 
 ###--- EDITING TERRAIN AND GPX MESH TO LOOK NICE ---###
 
@@ -210,19 +210,19 @@ print("ready to render")
 rnd = bpy.data.scenes['Scene'].render
 rnd.resolution_x = 1000
 rnd.resolution_y = 1000
-rnd.resolution_percentage = 100
+rnd.resolution_percentage = 20
 bpy.context.scene.cycles.samples = 50
 bpy.context.scene.render.tile_x = 128
 bpy.context.scene.render.tile_y = 128
 
 #get gpx file name and remove "uploads/" and ".gpx" to make a nice output name with renderID included
-renderpath = '/home/pi/gpx-renderer/public/renders/' + argv[1] + argv[0][8:-4] + '_render.png'
+renderpath = '/home/pi/birdview/gpx-renderer/public/renders/' + argv[1] + argv[0][8:-4] + '_render.png'
 rnd.filepath = renderpath
 bpy.ops.render.render(write_still=True)
 
 print("Rendering done ! The file is here : " + renderpath)
 
 #save file, useful to debug what happened with the script
-bpy.ops.wm.save_as_mainfile(filepath="/home/pi/gpx-renderer/blender/blosm-after.blend",copy=True)
+bpy.ops.wm.save_as_mainfile(filepath="/home/pi/birdview/gpx-renderer/blender/blosm-after.blend",copy=True)
 
 sys.exit(123)
