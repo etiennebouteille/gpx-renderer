@@ -1,28 +1,18 @@
 import { Sequelize } from "sequelize";
 import db from "../config/database.js";
 
-const blogs = db.define(
-  "renders",
+const tokens = db.define(
+  "session",
   {
-    id: {
-      type: Sequelize.INTEGER,
+    sid: {
+      type: Sequelize.STRING,
       primaryKey: true,
-      autoIncrement: true,
     },
-    filename: {
-      type: Sequelize.STRING,
+    sess: {
+      type: Sequelize.JSON,
     },
-    title: {
-      type: Sequelize.STRING,
-    },
-    eventDate: {
+    expire: {
       type: Sequelize.DATE,
-    },
-    defaultTitle: {
-      type: Sequelize.BOOLEAN,
-    },
-    renderFinished: {
-      type: Sequelize.BOOLEAN,
     },
   },
   {
@@ -30,7 +20,9 @@ const blogs = db.define(
     // transform all passed model names (first parameter of define) into plural.
     // if you don't want that, set the following
     freezeTableName: true,
+    //by default sequelize adds createdAt and updatedAt fields but we dont need it for this table
+    timestamps: false,
   }
 );
 
-export default blogs;
+export default tokens;

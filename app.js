@@ -12,6 +12,7 @@ import mainRouter from "./routes/main.js";
 import uploadRouter from "./routes/upload.js";
 import rendersRouter from "./routes/renders.js";
 import stravaRouter from "./routes/strava.js";
+import sessionRouter from "./routes/session.js";
 
 import db from "./config/database.js";
 import Render from "./models/Renders.js";
@@ -61,6 +62,7 @@ app.use("/", mainRouter);
 app.use("/renders", rendersRouter);
 app.use("/upload", uploadRouter(io));
 app.use("/strava", stravaRouter);
+app.use("/session", sessionRouter);
 
 io.on("connection", (socket) => {
   console.log("User connected to the server : " + socket.id);
