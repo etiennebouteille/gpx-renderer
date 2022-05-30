@@ -1,8 +1,8 @@
 import { Sequelize } from "sequelize";
 import db from "../config/database.js";
 
-const tokens = db.define(
-  "session",
+const session = db.define(
+  "testSession",
   {
     sid: {
       type: Sequelize.STRING,
@@ -25,4 +25,4 @@ const tokens = db.define(
   }
 );
 
-export default tokens;
+export default session;
