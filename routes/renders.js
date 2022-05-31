@@ -34,6 +34,16 @@ router.get("/api/:id", async (req, res) => {
     });
 });
 
+//new version of the call to edit the title of a render
+router.put("/edittitle/:id", async (req, res) => {
+  console.log("received title update request : ", req.body.title);
+  await Render.upsert({
+    id: req.params.id,
+    title: req.body.title,
+    defaultTitle: false,
+  }).then(res.sendStatus(200));
+});
+
 router.post("/:id", async (req, res) => {
   await Render.upsert({
     id: req.params.id,

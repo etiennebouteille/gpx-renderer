@@ -2,6 +2,16 @@ import express from "express";
 import Session from "../models/Session.js";
 const router = express.Router();
 
+router.get("/:id", async (req, res) => {
+  await Session.findByPk(req.params.id)
+    .then((sessionData) => {
+      res.send(sessionData);
+    })
+    .catch((err) => {
+      res.status(404).send(err);
+    });
+});
+
 //create a new session session in the dbmatched with a cookie on the client
 router.post("/create", async (req, res) => {
   Session.create({
