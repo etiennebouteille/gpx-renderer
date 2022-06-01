@@ -1,11 +1,69 @@
 import "dotenv/config";
 import express from "express";
 import StravaTokens from "../models/StravaTokens.js";
+import Session from "../models/Session.js";
 import axios from "axios";
 import url from "url";
 import slugify from "slugify";
 
 const router = express.Router();
+
+//get strava access token so it can be stored client side. Only the session which has the strava id already saved can query this
+router.get("/api/gettoken", async (req, res) => {
+  const stravaIdCheck = await Session.findByPk(req.query.sid).then((_res) => {
+    return _res.sess.stravaid;
+  });
+
+  if (stravaIdCheck == req.query.stravaid) {
+    const token = await StravaTokens.findByPk(req.query.stravaid);
+    const body = {
+      id: token.id,
+      access_token: token.access_token,
+      expires_at: token.expires_at,
+    };
+    res.send(body);
+  } else {
+    res.sendStatus(401);
+  }
+});
+
+router.get("/api/auth", async (req, res) => {
+  if (req.body.stravaid) {
+    const token = await StravaTokens.findByPk(req.body.stravaid).then(
+      (token) => {
+        return token;
+      }
+    );
+    const now = Date.now();
+
+    if (token.expires_at < now) {
+      //token is expired, need to request a new one
+      const reAuthBody = {
+        client_id: "77608",
+        client_secret: process.env.STRAVA_CLIENT_SECRET,
+        grant_type: "refresh_token",
+        refresh_token: token.refresh_token,
+      };
+      axios
+        .post("https://www.strava.com/api/v3/oauth/token", reAuthBody)
+        .then((_res) => {
+          StravaTokens.upsert({
+            id: req.body.stravaid,
+            access_token: _res.data.access_token,
+            expires_at: new Date(_res.data.expires_at * 1000),
+            refreshToken: _res.data.refresh_token,
+          });
+          res.redirect("/strava/activities");
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(500);
+        });
+    }
+  } else {
+    res.status(401).send("no strava id received");
+  }
+});
 
 router.get("/auth", async (req, res) => {
   //TODO: handle rejection
@@ -80,6 +138,34 @@ router.get("/oauth-callback", (req, res) => {
       console.log(err);
       res.status(500);
     });
+});
+
+router.post("/api/stravaid", async (req, res) => {
+  console.log("adding strava id to session");
+  let sessdata = await Session.findByPk(req.body.sid);
+  sessdata.sess.stravaid = req.body.stravaid;
+  sessdata.changed("sess", true);
+  await sessdata.save();
+  res.sendStatus(200);
+});
+
+router.post("/api/create-athlete", async (req, res) => {
+  console.log("create athlete api called");
+  StravaTokens.upsert({
+    id: req.body.athleteID,
+    access_token: req.body.access_token,
+    expires_at: new Date(req.body.expires_at * 1000),
+    refresh_token: req.body.refresh_token,
+  }).catch((err) => {
+    res.status(401).send(err);
+  });
+
+  let sessdata = await Session.findByPk(req.body.sid);
+  sessdata.sess.stravaid = req.body.athleteID;
+  sessdata.changed("sess", true);
+  await sessdata.save();
+
+  res.sendStatus(200);
 });
 
 //TODO store this info on the auth callback instead of here, just got to deal with the session thing
