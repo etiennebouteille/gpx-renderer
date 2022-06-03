@@ -212,5 +212,52 @@ export default function (io) {
     );
   });
 
+  //same as above but for the fronted, mostly it returns an OK and render ID instead of a full html page
+  router.post("/api/strava", async (req, res) => {
+    console.log("api strava upload! strava : ", req.body.stravaid);
+    const access_token = await StravaTokens.findByPk(req.body.stravaid).then(
+      (token) => {
+        return token.access_token;
+      }
+    );
+    const gpxFile = await axios({
+      method: "get",
+      url: `https://www.strava.com/api/v3/activities/${req.body.id}/streams`,
+      params: { keys: "latlng,altitude" },
+      headers: {
+        Authorization: "Bearer " + access_token,
+      },
+    }).then((_res) => {
+      const latlon = _res.data[0].data;
+      const altitude = _res.data[2].data;
+
+      const gpx = makeGpx(req.body.name, latlon, altitude);
+
+      const name = req.body.name + ".gpx";
+      const destination = "uploads/";
+      const path = destination.concat(name);
+
+      fs.writeFile(path, gpx, (err) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("gpx file written successfully at : " + path);
+        }
+      });
+
+      const file = {
+        name,
+        path,
+      };
+      return file;
+    });
+    newRenderEntry(req, io, gpxFile.name, gpxFile.path, req.body.name).then(
+      (renderID) => {
+        const response = {renderID:renderID}
+        res.send(response);
+      }
+    );
+  });
+
   return router;
 }

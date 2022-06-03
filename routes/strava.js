@@ -27,9 +27,15 @@ router.get("/api/gettoken", async (req, res) => {
   }
 });
 
+//renews access token with strava api if it has expired
 router.get("/api/auth", async (req, res) => {
-  if (req.body.stravaid) {
-    const token = await StravaTokens.findByPk(req.body.stravaid).then(
+  console.log("strava reauth api route");
+  const stravaIdCheck = await Session.findByPk(req.query.sid).then((_res) => {
+    return _res.sess.stravaid;
+  });
+
+  if (stravaIdCheck == req.query.stravaid) {
+    const token = await StravaTokens.findByPk(req.query.stravaid).then(
       (token) => {
         return token;
       }
@@ -37,6 +43,7 @@ router.get("/api/auth", async (req, res) => {
     const now = Date.now();
 
     if (token.expires_at < now) {
+      console.log("token expired - reauthenticating");
       //token is expired, need to request a new one
       const reAuthBody = {
         client_id: "77608",
@@ -53,15 +60,26 @@ router.get("/api/auth", async (req, res) => {
             expires_at: new Date(_res.data.expires_at * 1000),
             refreshToken: _res.data.refresh_token,
           });
-          res.redirect("/strava/activities");
+          const body = {
+            access_token: _res.data.access_token,
+            expires_at: new Date(_res.data.expires_at * 1000),
+          };
+          res.send(body);
         })
         .catch((err) => {
           console.log(err);
           res.status(500);
         });
+    } else {
+      console.log("token still valid, sending back access token");
+      const body = {
+        access_token: token.access_token,
+        expires_at: token.expires_at,
+      };
+      res.send(body);
     }
   } else {
-    res.status(401).send("no strava id received");
+    res.status(401).send("invalid request");
   }
 });
 
@@ -227,6 +245,8 @@ async function getActivities(access_token, page) {
       headers: { Authorization: "Bearer " + access_token },
     })
     .then((_res) => {
+      console.log("straight stava response");
+      console.log(_res);
       const sorties = [];
       for (let i = 0; i < _res.data.length; i++) {
         let current = {
