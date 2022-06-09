@@ -6,7 +6,11 @@ const app = express();
 import { createServer } from "http";
 import { Server } from "socket.io";
 const server = createServer(app);
-const io = new Server(server);
+const io = new Server(server, { cors: { origin: "*" } });
+
+import Session from "./models/Session.js";
+import { Op } from "sequelize";
+import cron from "node-cron";
 
 import mainRouter from "./routes/main.js";
 import uploadRouter from "./routes/upload.js";
@@ -102,3 +106,15 @@ app.get("*", function (req, res) {
 server.listen(port, () =>
   console.log(`App started, listening on port ${port}...`)
 );
+
+//delete expired cookies from db every 5 minutes
+cron.schedule("*/5 * * * *", () => {
+  const now = new Date();
+  Session.destroy({
+    where: {
+      expire: {
+        [Op.lte]: now,
+      },
+    },
+  });
+});

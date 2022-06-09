@@ -55,7 +55,7 @@ router.get("/api/auth", async (req, res) => {
         .post("https://www.strava.com/api/v3/oauth/token", reAuthBody)
         .then((_res) => {
           StravaTokens.upsert({
-            id: req.body.stravaid,
+            id: req.query.stravaid,
             access_token: _res.data.access_token,
             expires_at: new Date(_res.data.expires_at * 1000),
             refreshToken: _res.data.refresh_token,

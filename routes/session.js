@@ -14,10 +14,11 @@ router.get("/:id", async (req, res) => {
 
 //create a new session session in the dbmatched with a cookie on the client
 router.post("/create", async (req, res) => {
+  console.log("creating session, expire date : ", req.body.expire);
   Session.create({
     sid: req.body.sid,
     sess: { createdRenders: [] },
-    expire: req.body.expires,
+    expire: req.body.expire,
   })
     .then(res.sendStatus(200))
     .catch((err) => res.status(404).send(err));

@@ -55,7 +55,8 @@ function render(filepath, io, renderID) {
           `child process close all stdio with code ${code}, rendering done`
         );
 
-        io.sockets.emit("success", "Rendering done !", imgpath);
+        io.sockets.emit("success", imgpath, renderID);
+        // io.sockets.emit("success", "Rendering done !", imgpath);
 
         Render.update(
           {
@@ -67,7 +68,7 @@ function render(filepath, io, renderID) {
         );
       } else {
         console.log("render failed");
-        io.sockets.emit("fail", "Rendering failed, sorry!");
+        io.sockets.emit("fail", renderID);
       }
 
       resolve(code);
@@ -253,7 +254,7 @@ export default function (io) {
     });
     newRenderEntry(req, io, gpxFile.name, gpxFile.path, req.body.name).then(
       (renderID) => {
-        const response = {renderID:renderID}
+        const response = { renderID: renderID };
         res.send(response);
       }
     );
