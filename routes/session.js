@@ -3,7 +3,7 @@ import Session from "../models/Session.js";
 const router = express.Router();
 
 router.get("/:id", async (req, res) => {
-  await Session.findByPk(req.params.id)
+  const session = Session.findByPk(req.params.id)
     .then((sessionData) => {
       res.send(sessionData);
     })

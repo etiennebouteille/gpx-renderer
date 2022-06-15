@@ -108,7 +108,7 @@ server.listen(port, () =>
 );
 
 //delete expired cookies from db every 5 minutes
-cron.schedule("*/5 * * * *", () => {
+cron.schedule("*/20 * * * *", () => {
   const now = new Date();
   Session.destroy({
     where: {
