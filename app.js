@@ -27,6 +27,8 @@ const pgSession = connectPg(session);
 
 import cors from "cors";
 
+import Bull from "bull";
+
 //settings for cookies db
 const pgPool = new pg.Pool({
   user: process.env.DBUSER,
@@ -97,6 +99,64 @@ app.get("/api/latest", async (req, res) => {
     where: { renderFinished: true },
   });
   res.send({ render });
+});
+
+//testing bull queue
+const renderQueue = new Bull("gpx-render-queue", {
+  limiter: {
+    max: 1,
+    duration: 5000,
+    bounceBack: true, // important
+  },
+});
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
+app.get("/bull", async (req, res) => {
+  const rID = getRandomInt(1, 200);
+  console.log("adding job to list with rID : ", rID);
+  const job = await renderQueue.add({
+    renderID: rID,
+    isRender: false,
+  });
+
+  res.send("Job added");
+});
+app.get("/bullrender", async (req, res) => {
+  const rID = getRandomInt(1, 200);
+  console.log("adding job to list with rID : ", rID);
+  const job = await renderQueue.add({
+    renderID: rID,
+    isRender: true,
+    filename: "Reprise-des-grimpettes.gpx",
+  });
+
+  res.send("Job added");
+});
+
+app.get("/getgpx/:id", async (req, res) => {
+  console.log("got a request for fil : ", req.params.id);
+  const file = `./uploads/${req.params.id}`;
+  res.download(file); // Set disposition and send it.
+});
+
+app.get("/counts", async (req, res) => {
+  const counts = await renderQueue.getJobCounts();
+  console.log(counts);
+
+  res.send(counts);
+});
+
+renderQueue.on("global:completed", (jobId, result) => {
+  console.log(`Job ${jobId} completed with result : ${result}`);
+});
+
+renderQueue.on("drained", () => {
+  console.log(`No more jobs in the queue`);
 });
 
 app.get("*", function (req, res) {
