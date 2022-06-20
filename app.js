@@ -67,7 +67,7 @@ const port = 5000;
 //main routing
 app.use("/", mainRouter);
 app.use("/renders", rendersRouter);
-app.use("/upload", uploadRouter(io));
+app.use("/upload", uploadRouter);
 app.use("/strava", stravaRouter);
 app.use("/session", sessionRouter);
 
@@ -132,7 +132,7 @@ app.get("/bullrender", async (req, res) => {
   const job = await renderQueue.add({
     renderID: rID,
     isRender: true,
-    filename: "Reprise-des-grimpettes.gpx",
+    filename: "Velo_tanninge_max.gpx",
   });
 
   res.send("Job added");
@@ -153,6 +153,14 @@ app.get("/counts", async (req, res) => {
 
 renderQueue.on("global:completed", (jobId, result) => {
   console.log(`Job ${jobId} completed with result : ${result}`);
+  const res = JSON.parse(result);
+  if (res.status == 123) {
+    console.log("render completed successfully");
+    io.sockets.emit("success", res.filename, res.renderID);
+  } else {
+    console.log("there was an error with the render");
+    //TODO : emettre et traiter message d'erreur
+  }
 });
 
 renderQueue.on("drained", () => {
