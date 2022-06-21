@@ -28,6 +28,8 @@ const pgSession = connectPg(session);
 import cors from "cors";
 
 import Bull from "bull";
+import { setTimeout } from "timers/promises";
+import PowerManager from "./modules/powerManager.js";
 
 //settings for cookies db
 const pgPool = new pg.Pool({
@@ -79,10 +81,6 @@ app.get("/about", (req, res) => {
   res.render("about");
 });
 
-app.get("/preview", (req, res) => {
-  res.render("render", { title: "tour des aravis", date: Date.now() });
-});
-
 app.get("/latest", async (req, res) => {
   const render = await Render.findAll({
     limit: 10,
@@ -110,46 +108,7 @@ const renderQueue = new Bull("gpx-render-queue", {
   },
 });
 
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min;
-}
-
-app.get("/bull", async (req, res) => {
-  const rID = getRandomInt(1, 200);
-  console.log("adding job to list with rID : ", rID);
-  const job = await renderQueue.add({
-    renderID: rID,
-    isRender: false,
-  });
-
-  res.send("Job added");
-});
-app.get("/bullrender", async (req, res) => {
-  const rID = getRandomInt(1, 200);
-  console.log("adding job to list with rID : ", rID);
-  const job = await renderQueue.add({
-    renderID: rID,
-    isRender: true,
-    filename: "Velo_tanninge_max.gpx",
-  });
-
-  res.send("Job added");
-});
-
-app.get("/getgpx/:id", async (req, res) => {
-  console.log("got a request for fil : ", req.params.id);
-  const file = `./uploads/${req.params.id}`;
-  res.download(file); // Set disposition and send it.
-});
-
-app.get("/counts", async (req, res) => {
-  const counts = await renderQueue.getJobCounts();
-  console.log(counts);
-
-  res.send(counts);
-});
+const RenderNodePower = new PowerManager(30000);
 
 renderQueue.on("global:completed", (jobId, result) => {
   console.log(`Job ${jobId} completed with result : ${result}`);
@@ -157,14 +116,34 @@ renderQueue.on("global:completed", (jobId, result) => {
   if (res.status == 123) {
     console.log("render completed successfully");
     io.sockets.emit("success", res.filename, res.renderID);
+
+    Render.update(
+      {
+        renderFinished: true,
+      },
+      {
+        where: { id: res.renderID },
+      }
+    );
   } else {
     console.log("there was an error with the render");
     //TODO : emettre et traiter message d'erreur
   }
 });
 
-renderQueue.on("drained", () => {
+renderQueue.on("global:drained", () => {
   console.log(`No more jobs in the queue`);
+  const shutdownDelay = 1000 * 60 * 2; //2 minutes
+  RenderNodePower.delayedPowerOff(shutdownDelay);
+});
+
+renderQueue.on("global:waiting", async function (jobId) {
+  RenderNodePower.cancelPowerOff();
+  if (!RenderNodePower.isPowerOn()) {
+    const pw = await RenderNodePower.poweron();
+    console.log("res : ", pw.data);
+  }
+  console.log("a job is waiting to be processed");
 });
 
 app.get("*", function (req, res) {
