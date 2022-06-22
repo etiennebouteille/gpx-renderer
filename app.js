@@ -21,42 +21,14 @@ import sessionRouter from "./routes/session.js";
 import db from "./config/database.js";
 import Render from "./models/Renders.js";
 
-import pg from "pg";
-import connectPg from "connect-pg-simple";
-const pgSession = connectPg(session);
-
 import cors from "cors";
 
 import Bull from "bull";
 
-//settings for cookies db
-const pgPool = new pg.Pool({
-  user: process.env.DBUSER,
-  host: "localhost",
-  database: "birdview",
-  password: process.env.DBPASSWORD,
-  port: 5432,
-});
-
-//cookies settings
-const sessionMiddleware = session({
-  store: new pgSession({
-    pool: pgPool,
-  }),
-  secret: process.env.SESSIONSECRET,
-  resave: false,
-  saveUninitialized: true,
-  cookie: {
-    maxAge: 1000 * 60 * 60 * 24 * 30, //1 mois
-    secure: false,
-    httpOnly: true,
-  },
-});
 
 //register view engine
 app.set("view engine", "ejs");
 app.use(express.static("public"));
-app.use(sessionMiddleware);
 app.use(cors());
 app.use(express.json());
 
@@ -108,6 +80,7 @@ const renderQueue = new Bull("gpx-render-queue", {
     duration: 5000,
     bounceBack: true, // important
   },
+   redis: { password: process.env.REDIS_DB_PASSWORD }
 });
 
 function getRandomInt(min, max) {
