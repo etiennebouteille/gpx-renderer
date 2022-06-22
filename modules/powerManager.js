@@ -6,27 +6,45 @@ class PowerManager {
   constructor() {
     this.powered = false;
     this.powerOffScheduled = false;
+    this.key = process.env.SCALEWAY_ACCESS_KEY_ID;
+    this.instanceID = process.env.SCALEWAY_INSTANCE_ID;
+    this.instanceIP = process.env.SCALEWAY_INSTANCE_IP;
   }
 
-  isPowerOn() {
-    return this.powered;
+  async isPowerOn() {
+    const url = `https://api.scaleway.com/instance/v1/zones/fr-par-1/servers/${this.instanceID}`;
+
+    const res = await axios({
+      method: "get",
+      url: url,
+      headers: {
+        "X-Auth-Token": this.key,
+      },
+    });
+
+    console.log("state : ", res.data.server.state);
+
+    if (
+      res.data.server.state === "running" ||
+      res.data.server.state == "starting"
+    ) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   async poweron() {
     console.log("turning on the render node");
     this.powered = true;
 
-    const key = process.env.SCALEWAY_ACCESS_KEY_ID;
-    const instanceID = process.env.SCALEWAY_INSTANCE_ID;
-
-    //TODO varaible env!!
-    const url = `https://api.scaleway.com/instance/v1/zones/fr-par-1/servers/${instanceID}/action`;
+    const url = `https://api.scaleway.com/instance/v1/zones/fr-par-1/servers/${this.instanceID}/action`;
 
     return await axios({
       method: "post",
       url: url,
       headers: {
-        "X-Auth-Token": key,
+        "X-Auth-Token": this.key,
       },
       data: {
         action: "poweron",
@@ -37,19 +55,15 @@ class PowerManager {
   async poweroff() {
     console.log("turning off the render node");
     this.powered = false;
-    const instanceIP = process.env.SCALEWAY_INSTANCE_IP;
-    const halted = await axios.get(`http://${instanceIP}/halt`);
+    const halted = await axios.get(`http://${this.instanceIP}/halt`);
 
-    const key = process.env.SCALEWAY_ACCESS_KEY_ID;
-    const instanceID = process.env.SCALEWAY_INSTANCE_ID;
-
-    const url = `https://api.scaleway.com/instance/v1/zones/fr-par-1/servers/${instanceID}/action`;
+    const url = `https://api.scaleway.com/instance/v1/zones/fr-par-1/servers/${this.instanceID}/action`;
 
     return await axios({
       method: "post",
       url: url,
       headers: {
-        "X-Auth-Token": key,
+        "X-Auth-Token": this.key,
       },
       data: {
         action: "poweroff",

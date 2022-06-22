@@ -24,6 +24,9 @@ const blogs = db.define(
     renderFinished: {
       type: Sequelize.BOOLEAN,
     },
+    renderFailed: {
+      type: Sequelize.BOOLEAN,
+    },
   },
   {
     // disable the modification of table names; By default, sequelize will automatically

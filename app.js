@@ -28,7 +28,6 @@ const pgSession = connectPg(session);
 import cors from "cors";
 
 import Bull from "bull";
-import { setTimeout } from "timers/promises";
 import PowerManager from "./modules/powerManager.js";
 
 //settings for cookies db
@@ -94,7 +93,7 @@ app.get("/api/latest", async (req, res) => {
   const render = await Render.findAll({
     limit: 10,
     order: [["id", "DESC"]],
-    where: { renderFinished: true },
+    where: { renderFinished: true, renderFailed: false },
   });
   res.send({ render });
 });
@@ -127,19 +126,31 @@ renderQueue.on("global:completed", (jobId, result) => {
     );
   } else {
     console.log("there was an error with the render");
-    //TODO : emettre et traiter message d'erreur
+    Render.update(
+      {
+        renderFinished: true,
+        renderFailed: true,
+      },
+      {
+        where: { id: res.renderID },
+      }
+    );
+    io.sockets.emit("fail", res.renderID);
   }
 });
 
+//event triggered when the job queue is empty
 renderQueue.on("global:drained", () => {
   console.log(`No more jobs in the queue`);
-  const shutdownDelay = 1000 * 60 * 2; //2 minutes
+  const shutdownDelay = 1000 * 60 * 2; //2 minutes en ms
   RenderNodePower.delayedPowerOff(shutdownDelay);
 });
 
 renderQueue.on("global:waiting", async function (jobId) {
   RenderNodePower.cancelPowerOff();
+  //check if the instance is already running
   if (!RenderNodePower.isPowerOn()) {
+    //turn on the instance
     const pw = await RenderNodePower.poweron();
     console.log("res : ", pw.data);
   }

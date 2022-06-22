@@ -21,6 +21,7 @@ router.post("/", async (req, res) => {
     eventDate: Date.now(),
     defaultTitle: true,
     renderFinished: false,
+    renderFailed: false,
   })
     .then((render) => {
       //add to the sessions created renders
