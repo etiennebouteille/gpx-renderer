@@ -2,7 +2,7 @@ import { Sequelize } from "sequelize";
 import db from "../config/database.js";
 
 const session = db.define(
-  "testSession",
+  "sessions",
   {
     sid: {
       type: Sequelize.STRING,
