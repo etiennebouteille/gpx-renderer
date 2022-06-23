@@ -26,7 +26,6 @@ import cors from "cors";
 import Bull from "bull";
 import PowerManager from "./modules/powerManager.js";
 
-
 //register view engine
 app.set("view engine", "ejs");
 app.use(express.static("public"));
@@ -77,7 +76,7 @@ const renderQueue = new Bull("gpx-render-queue", {
     duration: 5000,
     bounceBack: true, // important
   },
-   redis: { password: process.env.REDIS_DB_PASSWORD }
+  redis: { password: process.env.REDIS_DB_PASSWORD },
 });
 
 const RenderNodePower = new PowerManager(30000);
@@ -122,12 +121,20 @@ renderQueue.on("global:drained", () => {
 renderQueue.on("global:waiting", async function (jobId) {
   RenderNodePower.cancelPowerOff();
   //check if the instance is already running
-  if (!RenderNodePower.isPowerOn()) {
+  const isOn = await RenderNodePower.isPowerOn();
+  if (!isOn) {
     //turn on the instance
+    console.log("going to turn on the instance");
     const pw = await RenderNodePower.poweron();
     console.log("res : ", pw.data);
   }
   console.log("a job is waiting to be processed");
+});
+
+app.get("/count", async (req, res) => {
+  const c = await renderQueue.getJobCounts();
+  // const c = await renderQueue.empty();
+  res.send(c);
 });
 
 app.get("*", function (req, res) {

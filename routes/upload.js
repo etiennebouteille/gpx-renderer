@@ -2,6 +2,9 @@ import express from "express";
 import Render from "../models/Renders.js";
 import Session from "../models/Session.js";
 import Bull from "bull";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { v4 as uuidv4 } from "uuid";
 
 const renderQueue = new Bull("gpx-render-queue", {
   limiter: {
@@ -9,6 +12,7 @@ const renderQueue = new Bull("gpx-render-queue", {
     duration: 5000,
     bounceBack: true, // important
   },
+  redis: { password: process.env.REDIS_DB_PASSWORD },
 });
 
 const router = express.Router();
@@ -48,6 +52,61 @@ router.post("/", async (req, res) => {
     res.send({ renderID });
   } else {
     res.status(500).send("Could not add render to the database");
+  }
+});
+
+router.post("/getSignedUrl", async (req, res) => {
+  console.log("req : ", req.body);
+
+  console.log("signing url");
+
+  const region = "fr-par";
+  const endpoint = "https://s3.fr-par.scw.cloud";
+
+  const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+  const secrectAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+  const signatureVersion = "v4";
+
+  console.log("keys : ", accessKeyId, secrectAccessKey);
+
+  const s3Client = new S3Client({
+    region,
+    endpoint,
+    accessKeyId,
+    secrectAccessKey,
+    signatureVersion,
+  });
+
+  const uuid = uuidv4();
+  const filename = `${uuid}_${req.body.filename}`;
+
+  const bucketParams = {
+    Bucket: "birdview-gpx",
+    Key: filename,
+    ContentType: "application/gpx+xml",
+  };
+
+  const command = new PutObjectCommand(bucketParams);
+
+  try {
+    const signedUrl = await getSignedUrl(s3Client, command, {
+      expiresIn: 3600,
+    });
+    console.log("signed url : ", signedUrl);
+    const body = {
+      message: "Success",
+      url: signedUrl,
+      filename: filename,
+    };
+    res.send(body);
+  } catch (err) {
+    console.log("url signing error : ", err);
+
+    const body = {
+      message: "Failed to get url",
+      error: err,
+    };
+    res.status(500).send(body);
   }
 });
 
