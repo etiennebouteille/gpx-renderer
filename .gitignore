@@ -8,3 +8,4 @@ blosm-cache/*
 blender/blosm-after.blend
 *.blend1
 .env
+*.config.js
